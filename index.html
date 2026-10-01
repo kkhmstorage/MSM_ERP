@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#022c22">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/064e3b/ffffff?text=MSM">
+    <title>Muhyissunna Secondary Madrasa ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        #video-background { position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -1; object-fit: cover; display: none; }
+        .nav-item.active { background-color: rgba(255,255,255,0.15); border-left: 4px solid #34d399; color: white; font-weight: 800; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .tab-btn.active { border-bottom: 2px solid #4f46e5; color: #4f46e5; font-weight: 800; }
+        .parent-tab.active { background-color: #ecfdf5; color: #047857; border-bottom: 2px solid #059669; font-weight: 800; }
+        @media print { .no-print { display: none !important; } body { background: white !important; } }
+        /* നെറ്റ്ലിഫൈ വാട്ടർമാർക്ക് ഹൈഡ് ചെയ്യാൻ */
+        a[href*="netlify.com"], div[id*="netlify-badge"] { display: none !important; opacity: 0 !important; visibility: hidden !important; }
+    </style>
+</head>
+<body class="text-slate-800 h-screen overflow-hidden flex flex-col relative">
+
+    <div id="dbLoader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#022c22] text-white transition-opacity duration-500">
+        <i class="fas fa-circle-notch fa-spin text-6xl text-emerald-400 mb-6"></i>
+        <h2 class="text-3xl font-black tracking-wider text-center px-4">MUHYISSUNNA SECONDARY MADRASA</h2>
+        <p class="text-sm text-emerald-200 mt-4 font-bold animate-pulse px-4 text-center">Connecting to Secure Cloud Database...</p>
+    </div>
+
+    <div id="uploadOverlay" class="fixed inset-0 bg-slate-900/80 z-[110] hidden items-center justify-center flex-col backdrop-blur-sm transition-opacity">
+        <i class="fas fa-cloud-upload-alt text-6xl text-emerald-400 mb-4 animate-bounce"></i>
+        <h2 class="text-2xl font-black text-white text-center px-4">Uploading to Google Drive...</h2>
+        <p class="text-emerald-200 mt-2 font-bold animate-pulse px-4 text-center">Please wait, this might take a moment.</p>
+    </div>
+
+    <video autoplay muted loop id="video-background"></video>
+
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-cover bg-center transition-opacity duration-300 opacity-0 pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80');">
+        <div class="absolute inset-0 bg-slate-900/30 backdrop-blur-sm"></div>
+        <div class="relative glass-panel p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md mx-4 transform transition-transform duration-500">
+            <div class="text-center mb-8">
+                <img id="loginLogo" src="https://placehold.co/100x100/064e3b/ffffff?text=MSM" alt="Logo" class="w-24 h-24 mx-auto rounded-full shadow-lg border-4 border-white mb-4 object-cover bg-white">
+                <h1 class="text-2xl md:text-3xl font-black text-[#064e3b] tracking-tight leading-tight">MUHYISSUNNA SECONDARY MADRASA</h1>
+                <p class="text-xs font-bold text-slate-700 mt-2 uppercase tracking-widest">Moochikkal, Valanchery</p>
+                <p class="text-[9px] font-bold text-slate-500 mt-1 uppercase">Affiliated to Samastha Kerala Islamatha Vidhyabyasa Board (Aff No: 171)</p>
+                <div class="mt-4 bg-emerald-100/90 text-emerald-900 text-xs font-bold px-4 py-1.5 rounded-full inline-block shadow-sm">ERP Portal Login</div>
+            </div>
+            <form onsubmit="window.handleLogin(event)" class="space-y-5">
+                <div><label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Username / Admission No</label><div class="relative"><i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i><input type="text" id="username" required class="w-full pl-11 pr-4 py-3.5 bg-white/80 border border-white/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b] focus:bg-white transition-all font-medium text-slate-800 shadow-inner" placeholder="Enter Username"></div></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Password</label><div class="relative"><i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i><input type="password" id="password" required class="w-full pl-11 pr-4 py-3.5 bg-white/80 border border-white/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b] focus:bg-white transition-all font-medium text-slate-800 shadow-inner" placeholder="••••••••"></div></div>
+                <button type="submit" class="w-full bg-[#064e3b] hover:bg-emerald-900 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-2">Login Securely <i class="fas fa-arrow-right text-sm"></i></button>
+            </form>
+            <p id="loginError" class="text-rose-600 text-sm font-bold text-center mt-4 hidden bg-rose-100/90 border border-rose-200 py-2 rounded-lg shadow-sm">Invalid Credentials!</p>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hidden h-full flex flex-col w-full no-print bg-slate-50">
+        <header class="bg-[#022c22] text-white shadow-md px-4 md:px-6 py-3 flex justify-between items-center z-30 flex-shrink-0 border-b-4 border-emerald-500">
+            <div class="flex items-center gap-3">
+                <button onclick="window.toggleSidebar()" class="md:hidden text-emerald-200 hover:text-white p-2"><i class="fas fa-bars text-xl"></i></button>
+                <img id="headerLogo" src="https://placehold.co/100x100/064e3b/ffffff?text=MSM" class="w-9 h-9 rounded-full bg-white object-cover hidden md:block">
+                <span class="font-extrabold text-lg tracking-wide hidden md:block">Muhyissunna Madrasa ERP</span>
+                <span class="font-bold text-lg md:hidden">MSM ERP</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block"><p class="text-sm font-bold" id="headerUserName">User Name</p><p class="text-[10px] text-emerald-300 font-medium tracking-wider uppercase" id="headerUserRole">Role</p></div>
+                <button onclick="window.logout()" class="bg-[#022c22] hover:bg-[#064e3b] border border-[#064e3b] text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-inner"><i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span></button>
+            </div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden relative">
+            <aside class="bg-slate-900 text-slate-300 w-64 flex-shrink-0 flex flex-col transition-transform duration-300 md:translate-x-0 absolute md:relative z-40 h-full -translate-x-full shadow-2xl md:shadow-none" id="sidebar">
+                <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2" id="navMenu"></nav>
+            </aside>
+            <main id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth w-full relative"></main>
+        </div>
+        
+        <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl font-bold text-sm pointer-events-none text-white bg-emerald-600">
+            <i id="toastIcon" class="fas fa-check-circle text-lg"></i>
+            <span id="toastMsg">Action successful!</span>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="leaveListModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-amber-500 p-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-lg"><i class="fas fa-clipboard-list mr-2"></i>Students On Leave</h3>
+                <button onclick="document.getElementById('leaveListModal').classList.add('hidden'); document.getElementById('leaveListModal').classList.remove('flex');" class="hover:text-amber-100 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="overflow-y-auto p-0">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0">
+                        <tr><th class="p-4">Student Name</th><th class="p-4">Class</th><th class="p-4">Date Out</th><th class="p-4">Reason</th><th class="p-4 text-center">Action</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100" id="leaveListTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="addStdModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"><div class="bg-indigo-600 p-4 flex justify-between items-center text-white flex-shrink-0"><h3 class="font-bold">Add Single Student</h3><button onclick="document.getElementById('addStdModal').classList.add('hidden'); document.getElementById('addStdModal').classList.remove('flex');" class="text-xl">&times;</button></div><form onsubmit="window.handleAddStudent(event)" class="p-6 space-y-4 bg-slate-50 overflow-y-auto"><div class="grid grid-cols-2 gap-4"><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Adm No</label><input required id="newAdm" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Class</label><input required id="newClass" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2"><label class="text-xs font-bold text-slate-500">Full Name</label><input required id="newName" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 border-t pt-3 mt-1"><h4 class="text-sm font-bold text-indigo-700 mb-2">Financial Details</h4></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Yearly Total Fee (₹)</label><input required id="newYearlyFee" type="number" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Monthly Installment (₹)</label><input required id="newMonthlyFee" type="number" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Fee Start Month</label><input required id="newFeeStart" type="date" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Due Day (e.g. 25 or 5)</label><input required id="newDueDay" type="number" max="31" min="1" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 border-t pt-3 mt-1"><label class="text-xs font-bold text-slate-500">Phone Number</label><input type="tel" id="newPhone" class="w-full border p-2.5 rounded-lg text-sm bg-white" placeholder="Optional"></div></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl mt-4 shadow-md">Save Student</button></form></div></div>
+    
+    <div id="editStdModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"><div class="bg-blue-600 p-4 flex justify-between items-center text-white flex-shrink-0"><h3 class="font-bold">Edit Student Profile</h3><button type="button" onclick="document.getElementById('editStdModal').classList.add('hidden'); document.getElementById('editStdModal').classList.remove('flex');" class="text-xl hover:text-blue-200">&times;</button></div><form onsubmit="window.handleSaveEditStudent(event)" class="p-6 space-y-4 bg-slate-50 overflow-y-auto"><input type="hidden" id="editAdm"><div class="grid grid-cols-2 gap-4"><div class="col-span-2"><label class="text-xs font-bold text-slate-500">Full Name</label><input required id="editName" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2"><label class="text-xs font-bold text-slate-500">Class</label><input required id="editClass" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 border-t pt-3 mt-1"><h4 class="text-sm font-bold text-blue-700 mb-2">Financial Details</h4></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Yearly Total Fee (₹)</label><input required id="editYearlyFee" type="number" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Monthly Installment (₹)</label><input required id="editMonthlyFee" type="number" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Total Paid (₹)</label><input required id="editTotalPaid" type="number" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Fee Start Date</label><input required id="editFeeStart" type="date" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-slate-500">Due Day (1-31)</label><input required id="editDueDay" type="number" max="31" min="1" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div><div class="col-span-2 border-t pt-3 mt-1"><label class="text-xs font-bold text-slate-500">Phone Number</label><input type="tel" id="editPhone" class="w-full border p-2.5 rounded-lg text-sm bg-white"></div></div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl mt-4 shadow-md transition">Update Profile</button></form></div></div>
+    
+    <div id="bulkUploadModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col"><div class="bg-[#022c22] p-4 flex justify-between items-center text-white flex-shrink-0"><h3 class="font-bold">Bulk Upload CSV</h3><button onclick="document.getElementById('bulkUploadModal').classList.remove('flex'); document.getElementById('bulkUploadModal').classList.add('hidden');" class="text-xl">&times;</button></div><div class="p-6 bg-slate-50 text-sm overflow-y-auto"><div class="mb-4"><label class="block text-xs font-bold text-slate-500 mb-2">Select Upload Type</label><select id="csvUploadType" class="w-full border p-3 rounded-lg bg-white font-bold text-indigo-700 outline-none"><option value="students">1. Add New Students</option><option value="records">2. Disciplinary & Achievements</option><option value="leaves">3. Leaves (IN / OUT)</option></select></div><button onclick="window.downloadCSVTemplate()" class="mb-6 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-4 py-3 rounded-lg text-sm font-bold w-full transition shadow-sm"><i class="fas fa-download mr-2"></i> Download Selected Template</button><div class="border-t pt-4"><label class="block text-xs font-bold text-slate-500 mb-2">Upload Filled CSV</label><input type="file" id="csvFileInput" accept=".csv" class="w-full border p-2.5 rounded-lg bg-white mb-4 outline-none"><button onclick="window.handleCSVUpload()" class="w-full bg-[#064e3b] hover:bg-emerald-900 text-white font-bold py-3 rounded-xl transition shadow-md">Upload Data</button></div></div></div></div>
+    
+    <div id="editExamModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]"><div class="bg-amber-500 p-4 flex justify-between items-center text-white flex-shrink-0"><h3 class="font-bold text-lg"><i class="fas fa-edit mr-2"></i>Edit Exam Details</h3><button type="button" onclick="document.getElementById('editExamModal').classList.add('hidden'); document.getElementById('editExamModal').classList.remove('flex');" class="text-xl hover:text-amber-200 transition">&times;</button></div><form onsubmit="window.saveEditedExam(event)" class="p-6 overflow-y-auto space-y-4 bg-slate-50"><input type="hidden" id="eExId"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-xs font-bold text-slate-500">Exam Name</label><input required id="eExName" class="w-full border p-3 rounded-lg text-sm bg-white"></div><div><label class="text-xs font-bold text-slate-500">Target Class</label><select required id="eExClassSelect" class="w-full border p-3 rounded-lg text-sm bg-white"></select></div></div><div class="border p-5 rounded-xl bg-white shadow-sm"><div class="flex justify-between items-center mb-4 border-b pb-2"><h5 class="font-bold text-sm text-slate-700">Subjects, Dates & Marks</h5><button type="button" onclick="window.addEditSubjRow()" class="text-xs bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1.5 rounded-lg font-bold transition">+ Add Subject</button></div><div id="editSubjRows" class="space-y-3"></div></div><div class="flex gap-3 pt-4"><button type="button" onclick="document.getElementById('editExamModal').classList.add('hidden'); document.getElementById('editExamModal').classList.remove('flex');" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-3 rounded-xl font-bold transition">Cancel</button><button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-xl font-bold shadow-md transition">Update Exam</button></div></form></div></div>
+    
+    <div id="feeModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col"><div class="bg-indigo-600 p-4 flex justify-between items-center text-white"><h3 class="font-bold">Record Fee Payment</h3><button onclick="document.getElementById('feeModal').classList.add('hidden'); document.getElementById('feeModal').classList.remove('flex');" class="text-xl">&times;</button></div><form onsubmit="window.submitFeePayment(event)" class="p-6 space-y-4 bg-slate-50"><input type="hidden" id="feeAdmNo"><div><label class="text-xs font-bold text-slate-500">Amount Paid (₹)</label><input type="number" required id="feeAmount" class="w-full border p-3 rounded-xl text-sm bg-white" min="1"></div><div><label class="text-xs font-bold text-slate-500">For Month & Year</label><input type="month" required id="feeMonthYear" class="w-full border p-3 rounded-xl text-sm bg-white"></div><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2">Save Payment</button></form></div></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration for MUHYISSUNNA SECONDARY MADRASA
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlOo1iqiKR7ajhwPjXULKiQedfY2e6Ups",
+            authDomain: "muhyisunna171-4abcc.firebaseapp.com",
+            projectId: "muhyisunna171-4abcc",
+            storageBucket: "muhyisunna171-4abcc.firebasestorage.app",
+            messagingSenderId: "917125533652",
+            appId: "1:917125533652:web:fbe633ecc8cc98f9135041"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const dbRef = doc(firestore, "erp_system", "database");
+
+        // Updated Google Apps Script URL for uploading images
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYkBdquFB_7kQwNRFvAUB0a2WmpiMs2R33NVpsPtoyK-1azOlVvOHrBU1ZEpwKuP6V/exec";
+
+        const DEFAULT_SETTINGS = {
+            logo: 'https://placehold.co/100x100/064e3b/ffffff?text=MSM', bg: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80', isVideoBg: false, bankName: 'HDFC BANK', accName: 'MUHYISSUNNA SECONDARY MADRASA', accNo: 'XXXXXXXXXXXXXX', ifsc: 'HDFC000XXXX', upi: 'msm@hdfcbank', qrCodeUrl: 'https://placehold.co/200x200/ffffff/000000?text=SCAN+TO+PAY'
+        };
+
+        const INITIAL_DB = { settings: DEFAULT_SETTINGS, notices: [], exams: [], students: [], teachers: [], classTasks: [] };
+
+        let db = null; window.currentUser = null; window.currentTab = ''; window.parentTab = 'fees';
+
+        function checkPersistentLogin() {
+            const savedUser = localStorage.getItem('msm_erp_user');
+            if(savedUser) { try { window.currentUser = JSON.parse(savedUser); return true; } catch(e) { localStorage.removeItem('msm_erp_user'); } }
+            return false;
+        }
+
+        async function loadDatabase() {
+            try {
+                const docSnap = await getDoc(dbRef);
+                if (docSnap.exists()) {
+                    db = docSnap.data();
+                    if(!db.exams) db.exams = []; if(!db.settings) db.settings = DEFAULT_SETTINGS; if(!db.students) db.students = []; if(!db.teachers) db.teachers = [];
+                    if(!db.classTasks) db.classTasks = [];
+                } else { db = INITIAL_DB; await setDoc(dbRef, db); }
+                
+                db.students.forEach(s => {
+                    if(!s.leaveHistory) s.leaveHistory = []; 
+                    if(!s.disciplineRecords) s.disciplineRecords = [];
+                    if(!s.achievements) s.achievements = []; 
+                    if(!s.examMarks) s.examMarks = {};
+                    if(!s.taskUpdates) s.taskUpdates = {};
+                });
+                db.exams.forEach(ex => {
+                    if (ex.isPublished === undefined) ex.isPublished = false;
+                });
+                if(!db.teachers) db.teachers = [];
+
+                window.initBranding();
+                document.getElementById('dbLoader').classList.add('opacity-0', 'pointer-events-none');
+                
+                setTimeout(() => { 
+                    document.getElementById('dbLoader').classList.add('hidden'); 
+                    if(checkPersistentLogin()) {
+                        document.getElementById('appContainer').classList.remove('hidden'); 
+                        window.setupNavigation(); window.renderApp(); 
+                    } else { document.getElementById('loginScreen').classList.remove('opacity-0', 'pointer-events-none'); }
+                }, 500);
+            } catch (error) {
+                document.getElementById('dbLoader').innerHTML = `<i class="fas fa-exclamation-triangle text-5xl text-rose-500 mb-6"></i><h2 class="text-2xl font-black text-white text-center px-4">Cloud Connection Failed</h2><p class="text-sm text-rose-200 mt-4 text-center max-w-md px-4 leading-relaxed">Please check your internet connection.</p>`;
+            }
+        }
+
+        window.saveDB = function() { setDoc(dbRef, db).catch(e => window.showToast("Failed to sync with Cloud!", "error")); }
+
+        window.uploadToDrive = async function(base64Data, filename) {
+            const overlay = document.getElementById('uploadOverlay');
+            overlay.classList.remove('hidden'); overlay.classList.add('flex');
+            try {
+                let response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ image: base64Data, filename: filename }) });
+                let result = await response.json();
+                overlay.classList.add('hidden'); overlay.classList.remove('flex');
+                if(result.success) return result.url; else throw new Error("Upload failed");
+            } catch(e) {
+                overlay.classList.add('hidden'); overlay.classList.remove('flex');
+                window.showToast("Failed to upload file to Google Drive!", "error"); return null;
+            }
+        }
+
+        window.getStudentFinancials = function(std) {
+            const today = new Date(); today.setHours(0, 0, 0, 0); 
+            let start = new Date(std.feeStartDate); if (isNaN(start.getTime())) { start = new Date(`${today.getFullYear()}-06-01`); } start.setHours(0, 0, 0, 0);
+            const dueDay = parseInt(std.dueDay) || 10; let monthsPassed = 0;
+            for (let i = 0; i < 12; i++) { 
+                let feeMonth = new Date(start.getFullYear(), start.getMonth() + i, 1);
+                let dueDate = (dueDay < 15) ? new Date(feeMonth.getFullYear(), feeMonth.getMonth() + 1, dueDay) : new Date(feeMonth.getFullYear(), feeMonth.getMonth(), dueDay);
+                if (today >= dueDate) { monthsPassed++; } else { break; }
+            }
+            const maxMonths = std.yearlyFee > 0 && std.monthlyFee > 0 ? Math.ceil(std.yearlyFee / std.monthlyFee) : 12;
+            if (monthsPassed > maxMonths) monthsPassed = maxMonths;
+            const expectedTotal = monthsPassed * (std.monthlyFee || 0);
+            let currentDue = expectedTotal - (std.totalPaid || 0); if (currentDue < 0) currentDue = 0; 
+            let remainingYearly = (std.yearlyFee || 0) - (std.totalPaid || 0); if (remainingYearly < 0) remainingYearly = 0;
+            return { expectedTotal, currentDue, remainingYearly, monthsPassed, formattedStartDate: start.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) };
+        }
+
+        window.getStudentRank = function(exId, admNo) {
+            const ex = db.exams.find(e => e.id === exId); if (!ex) return '-';
+            const stds = db.students.filter(s => s.class === ex.class); let totals = [];
+            stds.forEach(s => {
+                let tot = 0; let hasMarks = false;
+                ex.subjects.forEach(sub => { let m = (ex.marks[s.admNo] && ex.marks[s.admNo][sub.name] !== undefined) ? ex.marks[s.admNo][sub.name] : '-'; if (m !== '-' && m !== 'AB') { tot += parseInt(m); hasMarks = true; } });
+                if(hasMarks) totals.push({ admNo: s.admNo, total: tot });
+            });
+            if (totals.length === 0) return '-'; totals.sort((a, b) => b.total - a.total); 
+            let rank = 1; for (let i = 0; i < totals.length; i++) { if (i > 0 && totals[i].total < totals[i-1].total) rank = i + 1; if (String(totals[i].admNo) === String(admNo)) return rank; }
+            return '-';
+        }
+
+        window.showToast = function(msg, type = 'success') {
+            const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg;
+            toast.className = `fixed bottom-6 right-6 transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl font-bold text-sm text-white ${type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'}`;
+            document.getElementById('toastIcon').className = type === 'error' ? 'fas fa-exclamation-triangle text-lg' : 'fas fa-check-circle text-lg';
+            setTimeout(() => { toast.classList.replace('translate-y-0', 'translate-y-20'); toast.classList.replace('opacity-100', 'opacity-0'); }, 3000);
+        }
+
+        window.openPrintWindow = function(htmlContent, title = "Print Document") {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`<html><head><title>${title}</title><style>body { font-family: Arial, sans-serif; padding: 20px; color: black; } @media print { .no-print { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } } table { width: 100%; border-collapse: collapse; margin-top: 15px; } th, td { border: 1px solid #ccc; padding: 10px; text-align: left; } th { background-color: #f3f4f6; } .center { text-align: center; } .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #022c22; padding-bottom: 15px; } .title { font-size: 24px; font-weight: bold; color: #022c22; margin: 0 0 5px 0; text-transform: uppercase; } .subtitle { font-size: 14px; margin: 0; color: #4b5563; } .print-btn { display: inline-block; padding: 10px 20px; background: #022c22; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size:14px; text-decoration:none; } .print-btn:hover { background: #064e3b; }</style></head><body><div class="no-print" style="text-align:center; padding-bottom: 20px; border-bottom: 2px dashed #ccc; margin-bottom: 20px;"><button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button></div>${htmlContent}</body></html>`);
+            printWindow.document.close(); setTimeout(() => { printWindow.focus(); }, 250);
+        }
+
+        window.initBranding = function() {
+            const loginScreen = document.getElementById('loginScreen'); const videoBg = document.getElementById('video-background');
+            if (db.settings.isVideoBg) { loginScreen.style.backgroundImage = 'none'; videoBg.src = db.settings.bg; videoBg.style.display = 'block'; } else { loginScreen.style.backgroundImage = `url('${db.settings.bg}')`; videoBg.style.display = 'none'; videoBg.src = ''; }
+            document.getElementById('loginLogo').src = db.settings.logo; document.getElementById('headerLogo').src = db.settings.logo;
+        }
+
+        window.handleLogin = function(e) {
+            e.preventDefault(); const user = document.getElementById('username').value.trim(); const pass = document.getElementById('password').value.trim();
+            const err = document.getElementById('loginError'); err.classList.add('hidden');
+            
+            if (user === 'admin' && pass === 'admin') {
+                window.currentUser = { role: 'admin', name: 'System Administrator' };
+            }
+            else if (user.startsWith('mentor') && pass === user) {
+                const mentorNum = parseInt(user.replace('mentor', ''));
+                if (mentorNum >= 1 && mentorNum <= 10) {
+                    window.currentUser = { role: 'mentor', name: 'Class Mentor ' + mentorNum };
+                }
+            }
+            else { 
+                const std = db.students.find(s => String(s.admNo) === String(user) && s.password === pass); 
+                if (std) window.currentUser = { role: 'parent', name: std.name, data: std }; 
+            }
+
+            if (window.currentUser) {
+                localStorage.setItem('msm_erp_user', JSON.stringify(window.currentUser));
+                document.getElementById('loginScreen').classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden'); window.setupNavigation(); window.renderApp(); window.showToast('Login Successful!'); }, 300);
+            } else { err.classList.remove('hidden'); err.innerText = "Invalid Credentials! Check username/password."; }
+        }
+
+        window.logout = function() { window.currentUser = null; localStorage.removeItem('msm_erp_user'); document.getElementById('appContainer').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden', 'opacity-0', 'pointer-events-none'); document.getElementById('username').value = ''; document.getElementById('password').value = ''; }
+        window.toggleSidebar = function() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+
+        window.setupNavigation = function() {
+            const nav = document.getElementById('navMenu'); document.getElementById('headerUserName').innerText = window.currentUser.name; document.getElementById('headerUserRole').innerText = window.currentUser.role === 'admin1' ? 'PRINCIPAL' : window.currentUser.role.toUpperCase(); nav.innerHTML = '';
+            let menu = [];
+            
+            if (window.currentUser.role === 'admin') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Overview' }, { id: 'search', icon: 'fa-user-graduate', label: 'Student Profile' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'teachers', icon: 'fa-chalkboard-teacher', label: 'Teachers' }, { id: 'fee', icon: 'fa-wallet', label: 'Finance & Fees' }, { id: 'exams', icon: 'fa-file-alt', label: 'Examinations' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' }, { id: 'notices', icon: 'fa-bullhorn', label: 'Notice Board' }, { id: 'settings', icon: 'fa-cog', label: 'Settings' } ];
+            else if (window.currentUser.role === 'admin1') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Overview' }, { id: 'search', icon: 'fa-user-graduate', label: 'Student Profile' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'teachers', icon: 'fa-chalkboard-teacher', label: 'Teachers' }, { id: 'exams', icon: 'fa-file-alt', label: 'Examinations' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' }, { id: 'notices', icon: 'fa-bullhorn', label: 'Notice Board' } ];
+            else if (window.currentUser.role === 'mentor') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Attendance' }, { id: 'search', icon: 'fa-search', label: 'Manage Profile & Leave' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory (IN/OUT)' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'exams', icon: 'fa-file-alt', label: 'View Exams' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' } ];
+            else if (window.currentUser.role === 'parent') { 
+                menu = [ { id: 'parent_portal', icon: 'fa-user-graduate', label: 'My Dashboard' } ]; 
+                window.currentTab = 'parent_portal'; 
+            }
+
+            if (window.currentUser.role !== 'parent') window.currentTab = menu[0].id;
+
+            menu.forEach(item => {
+                const btn = document.createElement('button'); btn.className = `nav-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 ${window.currentTab === item.id ? 'active' : ''}`;
+                btn.innerHTML = `<i class="fas ${item.icon} w-5 text-center"></i> ${item.label}`;
+                btn.onclick = () => { window.currentTab = item.id; document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); if(window.innerWidth < 768) window.toggleSidebar(); window.renderApp(); };
+                nav.appendChild(btn);
+            });
+        }
+
+        window.renderApp = function() {
+            const content = document.getElementById('mainContent'); let html = '';
+            if (window.currentTab === 'dash') html = window.renderDashboard(); 
+            else if (window.currentTab === 'search') html = window.renderStudentSearchUI(); 
+            else if (window.currentTab === 'dir') html = window.renderDirectory(); 
+            else if (window.currentTab === 'daily_tasks') html = window.renderDailyTasksReport();
+            else if (window.currentTab === 'teachers') html = window.renderAdminTeachers(); 
+            else if (window.currentTab === 'fee') html = window.renderAdminFee(); 
+            else if (window.currentTab === 'exams') html = window.renderExams(); 
+            else if (window.currentTab === 'achieve') html = window.renderGlobalAchievements(); 
+            else if (window.currentTab === 'notices') html = window.renderAdminNotices(); 
+            else if (window.currentTab === 'settings') html = window.renderSettings(); 
+            else if (window.currentTab === 'parent_portal') html = window.renderParentPortal();
+            content.innerHTML = html;
+        }
+
+        window.renderDailyTasksReport = function() {
+            const classes = [...new Set(db.students.map(s => s.class))].filter(Boolean).sort();
+            const today = window.lastSelectedTaskDate || new Date().toISOString().split('T')[0];
+            const selClass = window.lastSelectedTaskClass || (classes.length > 0 ? classes[0] : '');
+
+            let html = `<div class="max-w-6xl mx-auto space-y-6">
+                <h2 class="text-2xl font-extrabold text-slate-800">Assign & View Daily Tasks</h2>
+                <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-1"><label class="text-xs font-bold text-slate-500">Select Date</label><input type="date" id="repDate" value="${today}" onchange="window.updateTaskReport()" class="w-full border p-3 rounded-xl text-sm font-bold bg-slate-50"></div>
+                    <div class="flex-1"><label class="text-xs font-bold text-slate-500">Select Class</label><select id="repClass" onchange="window.updateTaskReport()" class="w-full border p-3 rounded-xl text-sm font-bold bg-slate-50"><option value="">-Select Class-</option>${classes.map(c=>`<option value="${c}" ${c===selClass?'selected':''}>${c}</option>`).join('')}</select></div>
+                </div>`;
+                
+            if(selClass) {
+                const existingTask = db.classTasks.find(t => t.date === today && t.class === selClass);
+                const taskText = existingTask ? existingTask.task : '';
+
+                html += `<div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100 shadow-sm">
+                    <label class="font-black text-sm text-indigo-800 block mb-2"><i class="fas fa-edit mr-2"></i>Assign Task for ${selClass} (${today}):</label>
+                    <textarea id="adminTaskText" class="w-full border p-3 rounded-lg text-sm bg-white shadow-inner" rows="2" placeholder="ഉദാഹരണത്തിന്: 5 വക്ത് നിസ്കരിക്കുക, ഖുർആൻ പത്താം പേജ് പാരായണം ചെയ്യുക...">${taskText}</textarea>
+                    <button onclick="window.saveClassTask()" class="mt-3 bg-indigo-600 hover:bg-indigo-700 transition text-white px-6 py-2.5 rounded-xl shadow-md font-bold text-sm">Save / Assign Task</button>
+                </div>`;
+
+                if(existingTask) {
+                    const stds = db.students.filter(s => s.class === selClass).sort((a,b)=>a.name.localeCompare(b.name));
+                    html += `<div class="bg-white rounded-2xl border shadow-sm overflow-hidden mt-6"><div class="bg-slate-50 p-4 border-b"><h3 class="font-bold text-slate-700">Student Responses</h3></div><div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-100 text-xs uppercase text-slate-500"><tr><th class="p-4">Adm No</th><th class="p-4">Student Name</th><th class="p-4">Status</th><th class="p-4 min-w-[200px]">Parent Note</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+                    
+                    stds.forEach(s => {
+                        const resp = (s.taskUpdates && s.taskUpdates[existingTask.id]) ? s.taskUpdates[existingTask.id] : null;
+                        let statBadge = `<span class="px-2 py-1 rounded text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">Pending</span>`;
+                        if(resp && resp.status === 'Completed') statBadge = `<span class="px-2 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Completed</span>`;
+                        else if(resp && resp.status === 'Not Completed') statBadge = `<span class="px-2 py-1 rounded text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">Not Completed</span>`;
+                        
+                        html += `<tr class="hover:bg-slate-50">
+                            <td class="p-4 font-mono text-slate-500">${s.admNo}</td>
+                            <td class="p-4 font-bold text-slate-800">${s.name}</td>
+                            <td class="p-4">${statBadge}</td>
+                            <td class="p-4 text-xs text-slate-600">${resp ? (resp.note || '-') : '-'}</td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table></div></div>`;
+                } else {
+                    html += `<div class="mt-6 p-6 text-center bg-white rounded-xl border text-slate-400 font-bold shadow-sm">No task assigned for this date yet. Fill the details above and save to assign.</div>`;
+                }
+            } else {
+                html += `<div class="p-8 text-center bg-white rounded-xl border text-slate-400 font-bold">Please select a class to view/assign tasks.</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        window.updateTaskReport = function() {
+            window.lastSelectedTaskDate = document.getElementById('repDate').value;
+            window.lastSelectedTaskClass = document.getElementById('repClass').value;
+            window.renderApp();
+        }
+
+        window.saveClassTask = function() {
+            const date = document.getElementById('repDate').value;
+            const cls = document.getElementById('repClass').value;
+            const text = document.getElementById('adminTaskText').value.trim();
+            if(!date || !cls) return window.showToast("Select date and class", "error");
+            if(!text) return window.showToast("Enter task details", "error");
+
+            if(!db.classTasks) db.classTasks = [];
+            let task = db.classTasks.find(t => t.date === date && t.class === cls);
+            if(task) {
+                task.task = text;
+            } else {
+                db.classTasks.push({ id: 'tk_'+Date.now(), date: date, class: cls, task: text });
+            }
+            window.saveDB();
+            window.showToast("Task Assigned to " + cls);
+            window.renderApp();
+        }
+
+        window.saveParentTaskResp = function(taskId) {
+            const stat = document.getElementById('ptStat_'+taskId).value;
+            const note = document.getElementById('ptNote_'+taskId).value.trim();
+            if(!stat) return window.showToast('Please select a status', 'error');
+
+            const std = db.students.find(s => String(s.admNo) === String(window.currentUser.data.admNo));
+            if(!std.taskUpdates) std.taskUpdates = {};
+            
+            std.taskUpdates[taskId] = { status: stat, note: note, updatedOn: new Date().toISOString() };
+            window.saveDB();
+            window.showToast('Response Saved!');
+            window.renderApp();
+        }
+
+        window.renderDashboard = function() {
+            const total = db.students.length; const inCampus = db.students.filter(s => s.leaveStatus === 'In Campus').length; const onLeave = total - inCampus;
+            const classes = {}; db.students.forEach(s => { if(!classes[s.class]) classes[s.class] = { total: 0, leave: 0 }; classes[s.class].total++; if(s.leaveStatus === 'On Leave') classes[s.class].leave++; });
+            
+            let leaveHtml = db.students.filter(s => s.leaveStatus === 'On Leave').map(s => { 
+                const activeLeave = (s.leaveHistory || []).find(l => !l.dateIn) || {}; 
+                return `<tr class="hover:bg-slate-50"><td class="p-4 font-bold text-slate-800">${s.name} <br><span class="text-xs font-mono text-slate-400">${s.admNo}</span></td><td class="p-4">${s.class}</td><td class="p-4 font-mono font-bold text-rose-500">${activeLeave.dateOut || 'N/A'}</td><td class="p-4 whitespace-normal max-w-xs text-slate-600">${activeLeave.reason || 'N/A'}</td><td class="p-4 text-center"><button onclick="window.markReturn('${s.admNo}')" class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold transition hover:bg-emerald-200"><i class="fas fa-sign-in-alt mr-1"></i> Report IN</button></td></tr>` 
+            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-500 font-bold">No students are currently on leave.</td></tr>';
+            
+            document.getElementById('leaveListTableBody').innerHTML = leaveHtml;
+            
+            return `<div class="space-y-6"><h2 class="text-2xl font-extrabold text-slate-800">Campus Overview</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-5"><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-indigo-500"><p class="text-slate-500 text-xs font-bold uppercase mb-1">Total Students</p><p class="text-4xl font-black text-slate-800">${total}</p></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-emerald-500"><p class="text-slate-500 text-xs font-bold uppercase mb-1">In Campus</p><p class="text-4xl font-black text-emerald-600">${inCampus}</p></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-amber-500 relative"><p class="text-slate-500 text-xs font-bold uppercase mb-1">Currently on Leave</p><p class="text-4xl font-black text-amber-600">${onLeave}</p><button onclick="document.getElementById('leaveListModal').classList.remove('hidden'); document.getElementById('leaveListModal').classList.add('flex');" class="absolute top-6 right-6 bg-amber-100 text-amber-800 hover:bg-amber-200 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">View List <i class="fas fa-list ml-1"></i></button></div></div><div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"><div class="bg-slate-50 p-4 border-b border-slate-200"><h3 class="font-bold text-slate-800"><i class="fas fa-layer-group text-indigo-500 mr-2"></i>Class-wise Status</h3></div><div class="p-0 overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-xs text-slate-500 uppercase bg-slate-100"><tr><th class="p-4">Class Name</th><th class="p-4 text-center">Total</th><th class="p-4 text-center">On Leave (Home)</th><th class="p-4 text-center">In Campus</th></tr></thead><tbody class="divide-y divide-slate-100">${Object.keys(classes).sort().map(c => `<tr class="hover:bg-slate-50"><td class="p-4 font-bold text-slate-700">${c}</td><td class="p-4 text-center">${classes[c].total}</td><td class="p-4 text-center"><span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-md font-bold text-xs">${classes[c].leave}</span></td><td class="p-4 text-center font-bold text-emerald-600">${classes[c].total - classes[c].leave}</td></tr>`).join('')}</tbody></table></div></div></div>`;
+        }
+
+        window.renderStudentSearchUI = function() {
+            const classes = [...new Set(db.students.map(s => s.class))].filter(Boolean).sort();
+            return `<div class="max-w-5xl mx-auto space-y-6"><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><h2 class="text-xl font-bold text-slate-800 mb-4"><i class="fas fa-search text-indigo-500 mr-2"></i> Find Student</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-xs font-bold text-slate-500 mb-1">Select Class</label><select id="searchClass" onchange="window.updateSearchNames()" class="w-full border p-3 rounded-xl bg-slate-50 outline-none"><option value="">-- Choose Class --</option>${classes.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div><div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 mb-1">Select Student</label><div class="flex gap-2"><select id="searchName" class="flex-1 border p-3 rounded-xl bg-slate-50 outline-none disabled:opacity-50" disabled><option value="">First select a class...</option></select><button onclick="window.searchStudent()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-md transition whitespace-nowrap">View Profile</button></div></div></div></div><div id="studentProfileResult"></div></div>`;
+        }
+
+        window.updateSearchNames = function() { const cls = document.getElementById('searchClass').value; const nameSelect = document.getElementById('searchName'); nameSelect.innerHTML = '<option value="">-- Select Student --</option>'; if(cls) { db.students.filter(s => s.class === cls).sort((a,b) => a.name.localeCompare(b.name)).forEach(s => { nameSelect.innerHTML += `<option value="${s.admNo}">${s.name} (Adm: ${s.admNo})</option>`; }); nameSelect.disabled = false; } else { nameSelect.innerHTML = '<option value="">First select a class...</option>'; nameSelect.disabled = true; } }
+        
+        window.resetStudentPassword = function(admNo) {
+            if(confirm("ഈ വിദ്യാർത്ഥിയുടെ പാസ്‌വേഡ് അഡ്മിഷൻ നമ്പറിലേക്ക് റീസെറ്റ് ചെയ്യണോ?")) {
+                const std = db.students.find(s => String(s.admNo) === String(admNo));
+                if(std) {
+                    std.password = std.admNo;
+                    window.saveDB();
+                    window.showToast('Password Reset Successful!');
+                    window.searchStudent(admNo);
+                }
+            }
+        }
+
+        window.addNote = function(admNo) {
+            const type = document.getElementById('noteType').value;
+            const note = document.getElementById('newNote').value.trim();
+            const remark = document.getElementById('newRemark').value.trim();
+            if(!note) return window.showToast('Please enter a note', 'error');
+            const std = db.students.find(s => String(s.admNo) === String(admNo));
+            const recordObj = { date: new Date().toISOString().split('T')[0], note: note, remark: remark, addedBy: window.currentUser.name };
+            if(type === 'discipline') {
+                std.disciplineRecords.push(recordObj);
+            } else {
+                std.achievements.push(recordObj);
+            }
+            window.saveDB();
+            window.showToast('Record Added');
+            window.searchStudent(admNo);
+        }
+
+        window.deleteRecord = function(admNo, type, date) {
+            if(!confirm('Delete this record?')) return;
+            const std = db.students.find(s => String(s.admNo) === String(admNo));
+            if(type === 'discipline') {
+                std.disciplineRecords = std.disciplineRecords.filter(r => r.date !== date);
+            } else {
+                std.achievements = std.achievements.filter(r => r.date !== date);
+            }
+            window.saveDB();
+            window.showToast('Record Deleted');
+            window.searchStudent(admNo);
+        }
+
+        window.searchStudent = function(directAdmNo = null) {
+            const adm = directAdmNo || document.getElementById('searchName').value; 
+            const res = document.getElementById('studentProfileResult'); 
+            const std = db.students.find(s => String(s.admNo) === String(adm));
+            
+            if(!std) { res.innerHTML = `<div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-center border font-bold">Please select a student.</div>`; return; }
+            const fin = window.getStudentFinancials(std);
+
+            let taskRows = '';
+            const stdTasks = (db.classTasks || []).filter(t => t.class === std.class).sort((a,b) => new Date(b.date) - new Date(a.date));
+            stdTasks.forEach(t => {
+                const resp = std.taskUpdates && std.taskUpdates[t.id];
+                let statBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border">Pending</span>`;
+                if(resp && resp.status === 'Completed') statBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border">Completed</span>`;
+                else if(resp && resp.status === 'Not Completed') statBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border">Not Completed</span>`;
+                
+                taskRows += `<tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono text-xs font-bold text-slate-600">${t.date}</td>
+                    <td class="p-3 text-xs text-slate-800 line-clamp-2">${t.task}</td>
+                    <td class="p-3">${statBadge}</td>
+                    <td class="p-3 text-xs text-slate-500">${resp ? (resp.note || '-') : '-'}</td>
+                </tr>`;
+            });
+            if(!taskRows) taskRows = '<tr><td colspan="4" class="p-4 text-center text-xs text-slate-400">No records found.</td></tr>';
+            
+            res.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"><div class="bg-slate-50 p-6 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4"><div class="flex items-center gap-4"><div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl font-black uppercase shadow-inner overflow-hidden">${std.photo ? `<img src="${std.photo}" class="w-full h-full object-cover">` : std.name.charAt(0)}</div><div><h3 class="text-2xl font-black text-slate-800">${std.name}</h3>${window.currentUser.role === 'admin' ? `<p class="text-xs mt-2 bg-indigo-50 text-indigo-800 p-2 rounded border border-indigo-100 inline-block"><b>Password:</b> ${std.password} <button onclick="window.resetStudentPassword('${std.admNo}')" class="ml-2 text-[10px] bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-700">Reset</button></p>` : ''}<p class="text-sm font-bold text-slate-500 mt-1">Adm No: ${std.admNo} • ${std.class}</p></div></div><div class="flex gap-2">${std.leaveStatus === 'In Campus' ? `<button onclick="window.markLeave('${std.admNo}')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg text-sm font-bold border transition"><i class="fas fa-sign-out-alt mr-1"></i>Mark OUT (Home)</button>` : `<button onclick="window.markReturn('${std.admNo}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg text-sm font-bold border transition"><i class="fas fa-sign-in-alt mr-1"></i>Report IN</button>`}
+                    ${window.currentUser.role === 'admin' ? `<button onclick="window.openEditStudent('${std.admNo}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border px-4 py-2 rounded-lg text-sm font-bold transition"><i class="fas fa-edit"></i></button><button onclick="window.deleteStudent('${std.admNo}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border px-4 py-2 rounded-lg text-sm font-bold transition"><i class="fas fa-trash"></i></button>` : ''}</div></div><div class="p-6 grid grid-cols-1 md:grid-cols-2 ${window.currentUser.role === 'admin' ? 'lg:grid-cols-3' : ''} gap-6">
+                        ${window.currentUser.role === 'admin' ? `<div class="border rounded-xl p-5 bg-white shadow-sm relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div><h4 class="font-bold text-slate-700 mb-4 border-b pb-2"><i class="fas fa-rupee-sign text-emerald-500 mr-2"></i>Fee Status & Payments</h4><div class="space-y-2 mb-4"><div class="flex justify-between text-xs text-slate-500"><span>Yearly Total:</span><span class="font-bold text-slate-700">₹${std.yearlyFee || 0}</span></div><div class="flex justify-between text-xs text-slate-500"><span>Fee Started From:</span><span class="font-bold text-indigo-600">${fin.formattedStartDate} (Due: ${std.dueDay}th)</span></div><div class="flex justify-between text-xs text-slate-500"><span>Total Paid:</span><span class="font-bold text-emerald-600">₹${std.totalPaid || 0}</span></div><div class="flex justify-between text-sm mt-2 pt-2 border-t"><span>Current Due (Arrears):</span><span class="font-black ${fin.currentDue > 0 ? 'text-rose-600' : 'text-emerald-600'}">₹${fin.currentDue}</span></div></div><div class="flex gap-2 mb-4"><button onclick="window.openFeeUpdate('${std.admNo}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">Record Payment</button>${fin.remainingYearly === 0 ? `<button onclick="window.printNoDue('${std.admNo}')" class="flex-1 bg-emerald-50 text-emerald-700 border text-xs font-bold py-2.5 rounded-lg transition"><i class="fas fa-certificate mr-1"></i> No Due</button>` : ''}</div><div class="border-t pt-3"><h5 class="text-xs font-bold text-slate-500 mb-2">Payment History</h5><div class="max-h-24 overflow-y-auto space-y-1 pr-1">${(std.feeHistory || []).slice().reverse().map(f => `<div class="text-[11px] flex justify-between border-b pb-1 border-slate-100"><span><b>${f.month}</b> <span class="text-slate-400">(${f.date})</span></span><span class="text-emerald-600 font-bold">₹${f.amount}</span></div>`).join('') || '<p class="text-[10px] text-slate-400">No records found.</p>'}</div></div></div>` : ''}
+                        <div class="border rounded-xl p-5 shadow-sm relative overflow-hidden ${std.leaveStatus === 'On Leave' ? 'bg-amber-50' : 'bg-emerald-50'}"><h4 class="font-bold text-slate-700 mb-3"><i class="fas fa-edit text-indigo-500 mr-2"></i>Add Record (Discipline / Achievement)</h4><div class="flex flex-col lg:flex-row gap-2"><select id="noteType" class="border p-2.5 rounded-xl text-sm outline-none bg-white font-bold"><option value="discipline">Discipline Issue</option><option value="achievement">Special Achievement</option></select><input type="text" id="newNote" placeholder="Title / Event..." class="flex-1 border p-2.5 rounded-xl text-sm outline-none"><input type="text" id="newRemark" placeholder="Remarks (Optional)..." class="flex-1 border p-2.5 rounded-xl text-sm outline-none"><button onclick="window.addNote('${std.admNo}')" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow transition">Save Record</button></div><div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"><div><h5 class="text-xs font-bold text-rose-500 uppercase mb-2 border-b pb-1">Disciplinary Records</h5><div class="space-y-2">${std.disciplineRecords.map(r => `<div class="bg-white p-3 rounded-lg border border-rose-100 text-sm flex justify-between shadow-sm"><div><span class="text-slate-400 font-mono text-xs mr-2">[${r.date}]</span> <b>${r.note}</b>${r.remark ? `<br><span class="text-slate-500 text-xs mt-1 block">Remark: ${r.remark}</span>` : ''}<span class="text-[10px] text-slate-400 block mt-1">Added by: ${r.addedBy || 'Admin'}</span></div><button onclick="window.deleteRecord('${std.admNo}', 'discipline', '${r.date}')" class="text-rose-400 hover:text-rose-600 ml-2"><i class="fas fa-trash"></i></button></div>`).join('') || '<p class="text-xs text-slate-400">No records.</p>'}</div></div><div><h5 class="text-xs font-bold text-emerald-500 uppercase mb-2 border-b pb-1">Achievements</h5><div class="space-y-2">${std.achievements.map(r => `<div class="bg-white p-3 rounded-lg border border-emerald-100 text-sm flex justify-between shadow-sm"><div><span class="text-slate-400 font-mono text-xs mr-2">[${r.date}]</span> <b>${r.note}</b>${r.remark ? `<br><span class="text-slate-500 text-xs mt-1 block">Remark: ${r.remark}</span>` : ''}<span class="text-[10px] text-slate-400 block mt-1">Added by: ${r.addedBy || 'Admin'}</span></div><button onclick="window.deleteRecord('${std.admNo}', 'achievement', '${r.date}')" class="text-rose-400 hover:text-rose-600 ml-2"><i class="fas fa-trash"></i></button></div>`).join('') || '<p class="text-xs text-slate-400">No achievements.</p>'}</div></div></div></div>
+                        <div class="${window.currentUser.role === 'admin' ? 'md:col-span-full' : 'md:col-span-2'} border rounded-xl p-5 shadow-sm bg-white mt-4"><h4 class="font-bold text-slate-700 mb-3"><i class="fas fa-tasks text-indigo-500 mr-2"></i>വീട്ടുവിശേഷങ്ങൾ (Daily Tasks History)</h4><div class="max-h-48 overflow-y-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0"><tr><th class="p-3">Date</th><th class="p-3">Assigned Task</th><th class="p-3">Status</th><th class="p-3">Parent Note</th></tr></thead><tbody class="divide-y divide-slate-100">${taskRows}</tbody></table></div></div>
+                    </div></div>
+            `;
+        }
+
+        window.markLeave = function(admNo) { 
+            const reason = prompt("Enter reason for leave:"); 
+            if(reason) { 
+                const std = db.students.find(s => String(s.admNo) === String(admNo)); 
+                if(std) {
+                    std.leaveStatus = 'On Leave'; 
+                    if(!std.leaveHistory) std.leaveHistory = []; 
+                    std.leaveHistory.push({ dateOut: new Date().toISOString().split('T')[0], reason: reason, dateIn: null }); 
+                    window.saveDB(); 
+                    window.showToast('Leave marked'); 
+                    if(window.currentTab === 'search') window.searchStudent(admNo); 
+                    else window.renderApp(); 
+                }
+            } 
+        }
+
+        window.markReturn = function(admNo) { 
+            const std = db.students.find(s => String(s.admNo) === String(admNo)); 
+            if(std) {
+                std.leaveStatus = 'In Campus'; 
+                if(!std.leaveHistory) std.leaveHistory = []; 
+                const lastLeave = std.leaveHistory[std.leaveHistory.length - 1]; 
+                if(lastLeave && !lastLeave.dateIn) { lastLeave.dateIn = new Date().toISOString().split('T')[0]; } 
+                window.saveDB(); 
+                window.showToast('Return recorded'); 
+                if(window.currentTab === 'search') window.searchStudent(admNo); 
+                else window.renderApp(); 
+            }
+        }
+
+        window.markAllMonthlyLeave = function() { 
+            if(!confirm("Are you sure you want to mark all 'In Campus' students as on 'Monthly Leave'?")) return; 
+            let count = 0; const today = new Date().toISOString().split('T')[0]; 
+            db.students.forEach(s => { 
+                if(s.leaveStatus === 'In Campus') { s.leaveStatus = 'On Leave'; s.leaveHistory.push({ dateOut: today, reason: 'Monthly Leave', dateIn: null }); count++; } 
+            }); 
+            if(count > 0) { window.saveDB(); window.showToast(count + " students marked on Monthly Leave"); window.renderApp(); } 
+        }
+
+        window.renderDirectory = function() {
+            return `
+                <div class="space-y-6 flex flex-col h-full"><div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"><h2 class="text-2xl font-extrabold text-slate-800">Student Directory</h2><div class="flex flex-wrap gap-2 w-full md:w-auto">
+                ${window.currentUser.role === 'admin' || window.currentUser.role === 'admin1' ? `<button onclick="window.exportAttendanceCSV()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition hover:bg-emerald-100"><i class="fas fa-download"></i> Attendance Report</button><button onclick="window.markAllMonthlyLeave()" class="bg-amber-100 text-amber-800 border px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition"><i class="fas fa-home"></i> Monthly Leave</button>` : ''}
+                ${window.currentUser.role === 'admin' ? `<button onclick="document.getElementById('bulkUploadModal').classList.remove('hidden'); document.getElementById('bulkUploadModal').classList.add('flex');" class="bg-indigo-50 text-indigo-700 border px-4 py-2 rounded-xl text-sm font-bold transition">Bulk Upload</button><button onclick="document.getElementById('addStdModal').classList.remove('hidden'); document.getElementById('addStdModal').classList.add('flex');" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition">Add Single Student</button>` : ''}
+                </div></div><div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 overflow-hidden flex flex-col"><div class="overflow-x-auto flex-1 p-0"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="text-xs text-slate-500 uppercase bg-slate-100 sticky top-0"><tr><th class="p-4">Adm No</th><th class="p-4">Name</th><th class="p-4">Class</th><th class="p-4">Location</th><th class="p-4 text-center">Actions</th></tr></thead><tbody class="divide-y divide-slate-100">
+                ${db.students.map(s => `<tr class="hover:bg-slate-50"><td class="p-4 font-mono text-slate-500">${s.admNo}</td><td class="p-4 font-bold text-slate-800">${s.name}</td><td class="p-4">${s.class}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.leaveStatus === 'In Campus' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${s.leaveStatus}</span></td><td class="p-4 text-center">
+                ${s.leaveStatus === 'On Leave' ? `<button onclick="window.markReturn('${s.admNo}')" class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold mr-1 transition hover:bg-emerald-200">Report IN</button>` : `<button onclick="window.markLeave('${s.admNo}')" class="bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-bold mr-1 transition hover:bg-amber-200">Mark OUT</button>`}
+                <button onclick="window.openStudentDirectly('${s.admNo}', '${s.class}')" class="text-indigo-600 border px-3 py-1.5 rounded-lg text-xs font-bold">Manage</button> 
+                ${window.currentUser.role === 'admin' ? `<button onclick="window.deleteStudent('${s.admNo}')" class="text-rose-500 border px-3 py-1.5 rounded-lg text-xs font-bold ml-1">Delete</button>` : ''}</td></tr>`).join('')}
+                </tbody></table></div></div></div>`;
+        }
+
+        window.exportAttendanceCSV = function() {
+            let csv = "Admission No,Name,Class,Status,Leave Reason\n";
+            db.students.forEach(s => {
+                let reason = '';
+                if(s.leaveStatus === 'On Leave' && s.leaveHistory && s.leaveHistory.length > 0) {
+                    reason = s.leaveHistory[s.leaveHistory.length-1].reason || '';
+                }
+                csv += `${s.admNo},${s.name},${s.class},${s.leaveStatus},${reason}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'attendance_report.csv');
+            a.click();
+        }
+
+        window.renderAdminTeachers = function() {
+            return `<div class="max-w-6xl mx-auto space-y-6 flex flex-col h-full">
+                <div class="flex justify-between items-center"><h2 class="text-2xl font-extrabold text-slate-800">Manage Teachers</h2>${window.currentUser.role === 'admin' ? `<button onclick="document.getElementById('addTeacherModal').classList.remove('hidden'); document.getElementById('addTeacherModal').classList.add('flex');" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition">+ Add Teacher</button>` : ''}</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${db.teachers.map(t => `<div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col items-center text-center relative">
+                        ${window.currentUser.role === 'admin' ? `<div class="absolute top-4 right-4 flex gap-2"><button onclick="window.openEditTeacher('${t.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-lg transition" title="Edit Teacher"><i class="fas fa-edit"></i></button><button onclick="window.deleteTeacher('${t.id}')" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-lg transition" title="Delete Teacher"><i class="fas fa-trash"></i></button></div>` : ''}
+                        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-black uppercase mb-4 shadow-inner overflow-hidden border-2 border-indigo-200 mt-2">${t.photo ? `<img src="${t.photo}" class="w-full h-full object-cover">` : t.name.charAt(0)}</div>
+                        <h3 class="text-lg font-black text-slate-800">${t.name}</h3><p class="text-sm font-bold text-indigo-600 mt-1">${t.subjects}</p><p class="text-xs text-slate-500 mt-2 line-clamp-2">${t.details}</p>
+                        <div class="flex gap-2 mt-4 w-full"><a href="tel:${t.phone}" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-bold transition flex justify-center items-center gap-1"><i class="fas fa-phone"></i> Call</a><a href="https://wa.me/91${t.phone}" target="_blank" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 py-2 rounded-lg text-xs font-bold transition flex justify-center items-center gap-1"><i class="fab fa-whatsapp"></i> WhatsApp</a></div>
+                    </div>`).join('') || '<p class="col-span-full text-center p-8 text-slate-500 bg-white rounded-xl border font-bold">No teachers added yet.</p>'}
+                </div></div>`;
+        }
+
+        window.openEditTeacher = function(id) {
+            const t = db.teachers.find(teacher => teacher.id === id); if(!t) return;
+            document.getElementById('editTId').value = t.id; document.getElementById('editTName').value = t.name; document.getElementById('editTSubj').value = t.subjects; document.getElementById('editTPhone').value = t.phone; document.getElementById('editTDetails').value = t.details || ''; document.getElementById('editTOldPhoto').value = t.photo || '';
+            document.getElementById('editTeacherModal').classList.remove('hidden'); document.getElementById('editTeacherModal').classList.add('flex');
+        }
+
+        window.saveEditTeacher = function(e) {
+            e.preventDefault(); const id = document.getElementById('editTId').value; const name = document.getElementById('editTName').value.trim(); const subjects = document.getElementById('editTSubj').value.trim(); const phone = document.getElementById('editTPhone').value.trim(); const details = document.getElementById('editTDetails').value.trim(); const oldPhoto = document.getElementById('editTOldPhoto').value; const photoInput = document.getElementById('editTPhoto');
+            const teacher = db.teachers.find(t => t.id === id); if(!teacher) return;
+            const updateDB = (photoUrl) => { teacher.name = name; teacher.subjects = subjects; teacher.phone = phone; teacher.details = details; teacher.photo = photoUrl; window.saveDB(); window.showToast('Teacher Updated Successfully!'); document.getElementById('editTeacherModal').classList.add('hidden'); document.getElementById('editTeacherModal').classList.remove('flex'); document.getElementById('editTForm').reset(); window.renderApp(); };
+            if(photoInput.files && photoInput.files[0]) { const reader = new FileReader(); reader.onload = async function(ev) { const driveUrl = await window.uploadToDrive(ev.target.result, photoInput.files[0].name); updateDB(driveUrl); }; reader.readAsDataURL(photoInput.files[0]); } else { updateDB(oldPhoto); }
+        }
+
+        window.addTeacher = function(e) { e.preventDefault(); const name = document.getElementById('tName').value.trim(); const subjects = document.getElementById('tSubj').value.trim(); const phone = document.getElementById('tPhone').value.trim(); const details = document.getElementById('tDetails').value.trim(); const photoInput = document.getElementById('tPhoto'); const saveToDB = (photoUrl) => { db.teachers.push({ id: 't_'+Date.now(), name, subjects, phone, details, photo: photoUrl }); window.saveDB(); window.showToast('Teacher Added Successfully!'); document.getElementById('addTeacherModal').classList.add('hidden'); document.getElementById('addTeacherModal').classList.remove('flex'); document.getElementById('tForm').reset(); window.renderApp(); }; if(photoInput.files && photoInput.files[0]) { const file = photoInput.files[0]; const reader = new FileReader(); reader.onload = async function(ev) { const driveUrl = await window.uploadToDrive(ev.target.result, file.name); saveToDB(driveUrl); }; reader.readAsDataURL(file); } else { saveToDB(null); } }
+        window.deleteTeacher = function(id) { if(confirm('Delete this teacher profile?')) { db.teachers = db.teachers.filter(t => t.id !== id); window.saveDB(); window.showToast('Teacher Deleted', 'error'); window.renderApp(); } }
+
+        window.renderAdminFee = function() { let exp=0, col=0, pen=0; const defClasses = {}; db.students.forEach(s => { const fin = window.getStudentFinancials(s); exp += (s.yearlyFee || 0); col += (s.totalPaid || 0); pen += fin.currentDue; if(fin.currentDue > 0) { if(!defClasses[s.class]) defClasses[s.class] = []; defClasses[s.class].push({ ...s, _currentDue: fin.currentDue }); } }); return `<div class="space-y-6 max-w-6xl mx-auto"><h2 class="text-2xl font-extrabold text-slate-800">Financial Overview</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-5"><div class="bg-white p-6 rounded-2xl border-t-4 border-t-blue-500 shadow-sm"><p class="text-xs font-bold text-slate-500">TOTAL EXPECTED</p><p class="text-3xl font-black text-slate-800">₹${exp}</p></div><div class="bg-white p-6 rounded-2xl border-t-4 border-t-emerald-500 shadow-sm"><p class="text-xs font-bold text-slate-500">TOTAL COLLECTED</p><p class="text-3xl font-black text-emerald-600">₹${col}</p></div><div class="bg-white p-6 rounded-2xl border-t-4 border-t-rose-500 shadow-sm"><p class="text-xs font-bold text-slate-500">ARREARS</p><p class="text-3xl font-black text-rose-600">₹${pen}</p></div></div><div class="bg-white rounded-2xl shadow-sm border mt-6"><div class="bg-slate-50 p-4 border-b flex justify-between items-center"><h3 class="font-bold text-slate-800">Defaulters List</h3><div class="flex gap-2"><select id="feeFilter" onchange="window.filterDef()" class="border p-2 rounded-lg text-sm font-bold"><option value="all">All Classes</option>${Object.keys(defClasses).sort().map(c=>`<option value="${c}">${c}</option>`).join('')}</select><button onclick="window.printDefList()" class="bg-[#022c22] text-white px-4 py-2 rounded-lg text-sm font-bold shadow">Print</button></div></div><div id="defTable" class="p-0 overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-xs text-slate-500 bg-slate-100"><tr><th class="p-4">Adm No</th><th class="p-4">Name</th><th class="p-4">Class</th><th class="p-4">Current Due Amount</th></tr></thead><tbody>${Object.keys(defClasses).length > 0 ? Object.keys(defClasses).length > 0 ? Object.keys(defClasses).map(c => defClasses[c].map(s => `<tr><td class="p-4 font-mono">${s.admNo}</td><td class="p-4 font-bold">${s.name}</td><td class="p-4">${s.class}</td><td class="p-4 font-black text-rose-600">₹${s._currentDue}</td></tr>`).join('')).join('') : '<tr><td colspan="4" class="p-6 text-center text-slate-400">No immediate dues.</td></tr>' : '<tr><td colspan="4" class="p-6 text-center text-slate-400">No immediate dues.</td></tr>'}</tbody></table></div></div></div>`; }
+        window.filterDef = function() { const cls = document.getElementById('feeFilter').value; let rows = ''; db.students.forEach(s => { const fin = window.getStudentFinancials(s); if(fin.currentDue > 0 && (cls==='all' || s.class===cls)) { rows += `<tr><td class="p-4 font-mono">${s.admNo}</td><td class="p-4 font-bold">${s.name}</td><td class="p-4">${s.class}</td><td class="p-4 font-black text-rose-600">₹${fin.currentDue}</td></tr>`; } }); document.getElementById('defTable').innerHTML = `<table class="w-full text-left text-sm"><thead class="text-xs text-slate-500 bg-slate-100"><tr><th class="p-4">Adm No</th><th class="p-4">Name</th><th class="p-4">Class</th><th class="p-4">Current Due Amount</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="p-6 text-center text-slate-400">No immediate dues.</td></tr>'}</tbody></table>`; };
+        window.printDefList = function() { const cls = document.getElementById('feeFilter').value; let list = []; db.students.forEach(s => { const fin = window.getStudentFinancials(s); if(fin.currentDue > 0 && (cls==='all' || s.class===cls)) { list.push({...s, _currDue: fin.currentDue}); } }); const html = `<div class="header"><h2 class="title" style="margin-bottom:2px;">MUHYISSUNNA SECONDARY MADRASA</h2><p class="subtitle" style="margin-top:0;">Affiliated to Samastha Kerala Islamatha Vidhyabyasa Board (Aff No: 171)<br>Moochikkal, Valanchery</p></div><div style="text-align:center; font-weight:bold; margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:5px;">Defaulters List - ${cls==='all'?'All Classes':cls}</div><table><tr><th>Adm No</th><th>Student Name</th><th>Class</th><th>Current Due</th></tr>${list.map(s=>`<tr><td class="center">${s.admNo}</td><td>${s.name}</td><td class="center">${s.class}</td><td class="center" style="color:red;font-weight:bold;">Rs. ${s._currDue}</td></tr>`).join('')}</table>`; window.openPrintWindow(html, "Defaulters_List"); }
+
+        window.openFeeUpdate = function(admNo) {
+            document.getElementById('feeAdmNo').value = admNo;
+            document.getElementById('feeAmount').value = '';
+            document.getElementById('feeMonthYear').value = '';
+            document.getElementById('feeModal').classList.remove('hidden');
+            document.getElementById('feeModal').classList.add('flex');
+        }
+
+        window.submitFeePayment = function(e) {
+            e.preventDefault();
+            const admNo = document.getElementById('feeAdmNo').value;
+            const amount = parseInt(document.getElementById('feeAmount').value);
+            const monthVal = document.getElementById('feeMonthYear').value;
+            
+            if(!amount || !monthVal) return;
+            
+            const std = db.students.find(s => String(s.admNo) === String(admNo));
+            if(std) {
+                std.totalPaid = (std.totalPaid || 0) + amount;
+                if(!std.feeHistory) std.feeHistory = [];
+                
+                const dateObj = new Date(monthVal + '-01');
+                const monthName = dateObj.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                const todayStr = new Date().toLocaleDateString('en-GB');
+
+                std.feeHistory.push({
+                    amount: amount,
+                    month: monthName,
+                    date: todayStr
+                });
+                
+                window.saveDB();
+                window.showToast('Fee Payment Recorded!');
+                document.getElementById('feeModal').classList.add('hidden');
+                document.getElementById('feeModal').classList.remove('flex');
+                
+                if(window.currentTab === 'search') window.searchStudent(admNo);
+                else window.renderApp();
+            }
+        }
+
+        window.printNoDue = function(admNo) {
+            const std = db.students.find(s => String(s.admNo) === String(admNo));
+            const html = `<div style="text-align:center; padding: 40px; border: 5px solid #022c22; border-radius: 15px; margin: 20px;">
+            <h1 style="color:#022c22; font-size: 28px; margin-bottom: 5px;">MUHYISSUNNA SECONDARY MADRASA</h1>
+            <p style="margin-top: 0; color: #555;">Affiliated to Samastha Kerala Islamatha Vidhyabyasa Board (Aff No: 171)</p>
+            <hr style="border:1px solid #ccc; margin: 20px 0;">
+            <h2 style="color:#059669; font-size: 24px; text-decoration: underline;">NO DUE CERTIFICATE</h2>
+            <p style="font-size: 18px; line-height: 1.8; margin-top: 30px;">This is to certify that <b>${std.name}</b> (Admission No: <b>${std.admNo}</b>) studying in Class <b>${std.class}</b> has cleared all fee dues up to the current academic month.</p>
+            <p style="font-size: 18px; margin-top: 20px;">Total Paid Amount: <b>Rs. ${std.totalPaid}</b></p>
+            <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+                <p style="font-weight:bold;">Date: ${new Date().toLocaleDateString()}</p>
+                <p style="font-weight:bold;">Authorized Signature</p>
+            </div></div>`;
+            window.openPrintWindow(html, `No_Due_${std.admNo}`);
+        }
+
+        window.renderExams = function() {
+            const classes = [...new Set(db.students.map(s => s.class))].filter(Boolean).sort();
+            return `
+                <div class="max-w-6xl mx-auto space-y-6"><h2 class="text-2xl font-extrabold text-slate-800">Examinations</h2>
+                    <div class="flex gap-2 border-b mb-6"><button onclick="window.switchExamTab('view')" id="exTab_view" class="px-6 py-3 font-bold tab-btn active">View Marklists</button>${window.currentUser.role === 'admin' || window.currentUser.role === 'admin1' ? `<button onclick="window.switchExamTab('create')" id="exTab_create" class="px-6 py-3 font-bold tab-btn text-slate-500">Create Exam</button><button onclick="window.switchExamTab('marks')" id="exTab_marks" class="px-6 py-3 font-bold tab-btn text-slate-500">Enter Marks</button>` : ''}</div>
+                    
+                    <div id="exView_view" class="space-y-4">
+                        ${db.exams.map(ex => `
+                            <div class="bg-white p-5 rounded-xl border flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm gap-4 ${ex.isPublished ? 'border-emerald-300' : ''}">
+                                <div>
+                                    <h4 class="font-black text-lg flex items-center gap-2">${ex.name} ${ex.isPublished ? '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold uppercase">Published</span>' : '<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold uppercase"><i class="fas fa-lock mr-1"></i> Hidden</span>'}</h4>
+                                    <p class="text-sm font-bold text-slate-500 mt-1">${ex.class} | ${ex.subjects.length} Subjects</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 items-center">
+                                    ${window.currentUser.role === 'admin' || window.currentUser.role === 'admin1' ? `
+                                        <button onclick="window.togglePublishExam('${ex.id}')" class="${ex.isPublished ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'} px-4 py-2 rounded-lg font-bold text-sm border transition shadow-sm hover:bg-opacity-80">
+                                            <i class="fas ${ex.isPublished ? 'fa-eye' : 'fa-eye-slash'} mr-1"></i> ${ex.isPublished ? 'Unpublish' : 'Publish'}
+                                        </button>
+                                        <div class="h-6 w-px bg-slate-200 mx-1 hidden md:block"></div>
+                                        <button onclick="window.editExam('${ex.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded-lg font-bold text-sm border transition"><i class="fas fa-edit"></i></button>
+                                        <button onclick="window.deleteExam('${ex.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-2 rounded-lg font-bold text-sm border transition"><i class="fas fa-trash"></i></button>
+                                    ` : ''}
+                                    <button onclick="window.printClassMarklist('${ex.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm border transition"><i class="fas fa-print mr-1"></i> Marklist</button>
+                                </div>
+                            </div>
+                        `).join('') || '<p class="text-slate-500 bg-white p-6 rounded-xl border text-center font-bold">No exams created.</p>'}
+                    </div>
+
+                    ${window.currentUser.role === 'admin' || window.currentUser.role === 'admin1' ? `
+                    <div id="exView_create" class="hidden bg-white p-6 rounded-xl border shadow-sm">
+                        <form onsubmit="window.saveExam(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-xs font-bold text-slate-500">Exam Name</label><input required id="cExName" class="w-full border p-3 rounded-lg text-sm bg-slate-50"></div><div><label class="text-xs font-bold text-slate-500">Target Class</label><select required id="cExClass" class="w-full border p-3 rounded-lg text-sm bg-slate-50"><option value="">--Select--</option>${classes.map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div></div>
+                            <div class="border p-5 rounded-xl bg-slate-50"><div class="flex justify-between items-center mb-4"><h5 class="font-bold text-sm">Subjects, Dates & Marks</h5><button type="button" onclick="window.addSubjRow()" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg shadow font-bold">+ Add Subject</button></div><div id="subjRows" class="space-y-3"></div></div>
+                            <button type="submit" class="bg-[#022c22] text-white px-8 py-3 rounded-xl font-bold">Save Exam</button>
+                        </form>
+                    </div>
+                    <div id="exView_marks" class="hidden space-y-4">
+                        <div class="bg-white p-6 rounded-xl border grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-xs font-bold text-slate-500">Select Exam</label><select id="mExId" onchange="window.updateMarkSubj()" class="w-full border p-3 rounded-lg"><option value="">-Select Exam-</option>${db.exams.map(e=>`<option value="${e.id}">${e.name} (${e.class})</option>`).join('')}</select></div><div><label class="text-xs font-bold text-slate-500">Select Subject</label><select id="mSubj" onchange="window.loadMarkEntry()" class="w-full border p-3 rounded-lg" disabled><option value="">-Select Subject-</option></select></div></div>
+                        <div id="markEntryArea" class="bg-white p-0 rounded-xl border hidden"></div>
+                    </div>` : ''}
+                </div>
+            `;
+        }
+
+        window.togglePublishExam = function(id) { const ex = db.exams.find(e => e.id === id); if(ex) { ex.isPublished = !ex.isPublished; window.saveDB(); window.showToast(ex.isPublished ? 'Exam Published to Parents!' : 'Exam Hidden from Parents!', ex.isPublished ? 'success' : 'error'); window.renderApp(); } }
+        window.switchExamTab = function(t) { ['view', 'create', 'marks'].forEach(x => { if(document.getElementById('exTab_'+x)) { document.getElementById('exTab_'+x).classList.remove('active', 'text-slate-500'); if(x === t) document.getElementById('exTab_'+x).classList.add('active'); else document.getElementById('exTab_'+x).classList.add('text-slate-500'); } if(document.getElementById('exView_'+x)) { document.getElementById('exView_'+x).classList.add('hidden'); if(x === t) document.getElementById('exView_'+x).classList.remove('hidden'); } }); if(t === 'create' && document.getElementById('subjRows').innerHTML === '') window.addSubjRow(); }
+        window.addSubjRow = function() { const div = document.createElement('div'); div.className = "flex gap-2 items-center subj-row bg-white p-2 rounded-lg border flex-wrap"; div.innerHTML = `<input type="text" placeholder="Subject Name" required class="flex-1 min-w-[150px] border p-2 rounded text-sm"><input type="date" required class="border p-2 rounded text-sm"><input type="number" placeholder="Max" required class="w-20 border p-2 rounded text-sm"><input type="number" placeholder="Pass" required class="w-20 border p-2 rounded text-sm"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-2"><i class="fas fa-trash"></i></button>`; document.getElementById('subjRows').appendChild(div); }
+        window.saveExam = function(e) { e.preventDefault(); const rows = document.querySelectorAll('.subj-row'); if(rows.length === 0) return alert("Add at least one subject!"); let subj = []; rows.forEach(r => { const ins = r.querySelectorAll('input'); subj.push({ name: ins[0].value, date: ins[1].value, maxMarks: parseInt(ins[2].value), passMark: parseInt(ins[3].value) }); }); db.exams.push({ id: 'ex_'+Date.now(), name: document.getElementById('cExName').value, class: document.getElementById('cExClass').value, subjects: subj, marks: {}, isPublished: false }); window.saveDB(); window.showToast('Exam Created'); window.switchExamTab('view'); window.renderApp(); }
+        window.updateMarkSubj = function() { const exId = document.getElementById('mExId').value; const subSel = document.getElementById('mSubj'); document.getElementById('markEntryArea').classList.add('hidden'); if(!exId) { subSel.innerHTML = '<option value="">-Select Subject-</option>'; subSel.disabled = true; return; } const ex = db.exams.find(e => e.id === exId); subSel.innerHTML = '<option value="">-Select Subject-</option>' + ex.subjects.map(s => `<option value="${s.name}">${s.name} (Max: ${s.maxMarks}) | ${s.date}</option>`).join(''); subSel.disabled = false; }
+        window.validateMark = function(input, maxMark) { let val = input.value.trim().toUpperCase(); if(val !== '' && val !== 'AB') { let num = parseInt(val); if(isNaN(num) || num < 0 || num > maxMark) { alert("Error! Maximum mark is " + maxMark + ". Please enter a valid number or 'AB'."); input.value = ''; input.style.border = '2px solid red'; } else { input.style.border = ''; } } else { input.style.border = ''; } }
+        window.loadMarkEntry = function() { const exId = document.getElementById('mExId').value; const subj = document.getElementById('mSubj').value; const area = document.getElementById('markEntryArea'); if(!subj) { area.classList.add('hidden'); return; } const ex = db.exams.find(e => e.id === exId); const subInfo = ex.subjects.find(s => s.name === subj); const stds = db.students.filter(s => s.class === ex.class).sort((a,b)=>a.name.localeCompare(b.name)); let rows = stds.map(s => { let m = (ex.marks[s.admNo] && ex.marks[s.admNo][subj] !== undefined) ? ex.marks[s.admNo][subj] : ''; return `<tr class="border-b"><td class="p-4 font-bold">${s.name} (${s.admNo})</td><td class="p-4 text-right"><input type="text" data-adm="${s.admNo}" value="${m}" placeholder="Mark / AB" class="mark-input border p-2 rounded-lg w-24 text-center font-bold" onchange="window.validateMark(this, ${subInfo.maxMarks})"></td></tr>`; }).join(''); area.innerHTML = `<div class="p-4 bg-indigo-50 border-b flex justify-between items-center"><h4 class="font-bold">Enter Marks: ${subj} (Max ${subInfo.maxMarks})</h4><button onclick="window.saveMarks()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow">Save Marks</button></div><div class="max-h-96 overflow-y-auto"><table class="w-full text-left text-sm"><tbody>${rows}</tbody></table></div>`; area.classList.remove('hidden'); }
+        window.saveMarks = function() { const exId = document.getElementById('mExId').value; const subj = document.getElementById('mSubj').value; const ex = db.exams.find(e => e.id === exId); const subInfo = ex.subjects.find(s => s.name === subj); let hasError = false; document.querySelectorAll('.mark-input').forEach(inp => { const adm = inp.getAttribute('data-adm'); let val = inp.value.trim().toUpperCase(); if(!ex.marks[adm]) ex.marks[adm] = {}; if(val !== '') { if(val === 'AB') { ex.marks[adm][subj] = 'AB'; inp.style.border = ''; } else { let num = parseInt(val); if(isNaN(num) || num < 0 || num > subInfo.maxMarks) { inp.style.border = '2px solid red'; hasError = true; } else { inp.style.border = ''; ex.marks[adm][subj] = num; } } } else { delete ex.marks[adm][subj]; } }); if(hasError) return alert("Some marks are invalid (exceeds max mark)."); window.saveDB(); window.showToast('Marks Saved!'); }
+        window.printClassMarklist = function(exId) { const ex = db.exams.find(e => e.id === exId); const stds = db.students.filter(s => s.class === ex.class).sort((a,b)=>a.name.localeCompare(b.name)); let html = `<div class="header"><h2 class="title" style="margin-bottom:2px;">MUHYISSUNNA SECONDARY MADRASA</h2><p class="subtitle" style="margin-top:0;">Affiliated to Samastha Kerala Islamatha Vidhyabyasa Board (Aff No: 171)<br>Moochikkal, Valanchery</p></div><div style="text-align:center; font-weight:bold; margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:5px;">Class Marklist</div><p style="font-weight:bold;margin-bottom:20px;">Class: ${ex.class} | Exam: ${ex.name}</p><table><tr><th>Adm No</th><th>Student Name</th>${ex.subjects.map(s=>`<th class="center">${s.name}<br><small>(Max: ${s.maxMarks}, Pass: ${s.passMark || 0})</small></th>`).join('')}<th class="center">Total</th><th class="center">%</th><th class="center">Rank</th></tr>${stds.map(s => { let tot = 0; let grandMax = 0; let mCols = ex.subjects.map(sub => { grandMax += sub.maxMarks; let m = (ex.marks[s.admNo] && ex.marks[s.admNo][sub.name] !== undefined) ? ex.marks[s.admNo][sub.name] : '-'; let isFail = (m !== '-' && m !== 'AB' && parseInt(m) < (sub.passMark || 0)); if(m !== '-' && m !== 'AB') tot += parseInt(m); return `<td class="center" style="${m === 'AB' || isFail ? 'color:red;font-weight:bold;' : ''}">${m}</td>`; }).join(''); let perc = grandMax > 0 && tot > 0 ? ((tot/grandMax)*100).toFixed(1) : '-'; let rank = window.getStudentRank(ex.id, s.admNo); return `<tr><td class="center">${s.admNo}</td><td style="font-weight:bold;">${s.name}</td>${mCols}<td class="center"><b>${tot}</b></td><td class="center font-bold">${perc}%</td><td class="center font-bold">${rank}</td></tr>`; }).join('')}</table>`; window.openPrintWindow(html, `Marklist_${ex.class}`); }
+        window.deleteExam = function(id) { if(confirm('Are you sure you want to delete this exam completely? All entered marks will be lost.')) { db.exams = db.exams.filter(e => e.id !== id); window.saveDB(); window.showToast('Exam Deleted', 'error'); window.renderApp(); } }
+        
+        window.editExam = function(id) { 
+            const ex = db.exams.find(e => e.id === id); if(!ex) return; 
+            document.getElementById('eExId').value = ex.id; 
+            document.getElementById('eExName').value = ex.name; 
+            const classes = [...new Set(db.students.map(s => s.class))].filter(Boolean).sort(); 
+            document.getElementById('eExClassSelect').innerHTML = `<option value="">--Select--</option>` + classes.map(c=>`<option value="${c}" ${c === ex.class ? 'selected' : ''}>${c}</option>`).join(''); 
+            const rowsContainer = document.getElementById('editSubjRows'); rowsContainer.innerHTML = ''; 
+            ex.subjects.forEach(sub => { 
+                const div = document.createElement('div'); div.className = "flex gap-2 items-center edit-subj-row bg-slate-50 p-2 rounded-lg border flex-wrap"; 
+                div.innerHTML = `<input type="hidden" class="orig-subj-name" value="${sub.name}"><input type="text" placeholder="Subject Name" required value="${sub.name}" class="new-subj-name flex-1 min-w-[150px] border p-2 rounded text-sm bg-white"><input type="date" required value="${sub.date}" class="subj-date border p-2 rounded text-sm bg-white"><input type="number" placeholder="Max" required value="${sub.maxMarks}" class="subj-max border p-2 rounded text-sm bg-white w-20"><input type="number" placeholder="Pass" required value="${sub.passMark || 0}" class="subj-pass border p-2 rounded text-sm bg-white w-20"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 p-2 transition"><i class="fas fa-trash"></i></button>`; 
+                rowsContainer.appendChild(div); 
+            }); 
+            document.getElementById('editExamModal').classList.remove('hidden'); document.getElementById('editExamModal').classList.add('flex'); 
+        }
+
+        window.addEditSubjRow = function() { 
+            const div = document.createElement('div'); div.className = "flex gap-2 items-center edit-subj-row bg-slate-50 p-2 rounded-lg border flex-wrap"; 
+            div.innerHTML = `<input type="hidden" class="orig-subj-name" value=""><input type="text" placeholder="Subject Name" required class="new-subj-name flex-1 min-w-[150px] border p-2 rounded text-sm bg-white"><input type="date" required class="subj-date border p-2 rounded text-sm bg-white"><input type="number" placeholder="Max" required class="subj-max border p-2 rounded text-sm bg-white w-20"><input type="number" placeholder="Pass" required class="subj-pass border p-2 rounded text-sm bg-white w-20"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 p-2 transition"><i class="fas fa-trash"></i></button>`; 
+            document.getElementById('editSubjRows').appendChild(div); 
+        }
+        
+        window.saveEditedExam = function(e) { 
+            e.preventDefault(); 
+            const id = document.getElementById('eExId').value; 
+            const ex = db.exams.find(e => e.id === id); 
+            const rows = document.querySelectorAll('.edit-subj-row'); 
+            if(rows.length === 0) return alert("Add at least one subject!"); 
+            
+            let newSubjects = []; let renameMap = {}; 
+            rows.forEach(r => { 
+                const orig = r.querySelector('.orig-subj-name').value; 
+                const name = r.querySelector('.new-subj-name').value.trim(); 
+                const date = r.querySelector('.subj-date').value; 
+                const max = parseInt(r.querySelector('.subj-max').value); 
+                const pass = parseInt(r.querySelector('.subj-pass').value) || 0; 
+                newSubjects.push({ name: name, date: date, maxMarks: max, passMark: pass }); 
+                if (orig && orig !== name) renameMap[orig] = name; 
+            }); 
+
+            if (Object.keys(renameMap).length > 0) { 
+                for (let admNo in ex.marks) { 
+                    for (let oldSubj in renameMap) { 
+                        if (ex.marks[admNo][oldSubj] !== undefined) { 
+                            ex.marks[admNo][renameMap[oldSubj]] = ex.marks[admNo][oldSubj]; 
+                            delete ex.marks[admNo][oldSubj]; 
+                        } 
+                    } 
+                } 
+            } 
+            
+            ex.name = document.getElementById('eExName').value; 
+            ex.class = document.getElementById('eExClassSelect').value; 
+            ex.subjects = newSubjects; 
+            window.saveDB(); 
+            window.showToast('Exam Updated Successfully'); 
+            document.getElementById('editExamModal').classList.add('hidden'); 
+            document.getElementById('editExamModal').classList.remove('flex'); 
+            window.renderApp(); 
+        }
+
+        window.renderParentPortal = function() {
+            const std = db.students.find(s => String(s.admNo) === String(window.currentUser.data.admNo));
+            if(!std) return '<div class="p-6 text-center text-rose-500">Student data not found!</div>';
+            
+            const fin = window.getStudentFinancials(std);
+            const hasFeeDues = fin.currentDue > 0;
+            
+            setTimeout(() => { if(hasFeeDues && window.parentTab === 'fees') window.showToast(`Notice: You have pending fee dues (₹${fin.currentDue})`, 'error'); }, 1500);
+
+            // രക്ഷിതാക്കൾക്ക് ആവശ്യമായ 3 ടാബുകൾ മാത്രം (Fees, Exams, Daily Tasks)
+            const tabs = [ 
+                {id: 'fees', icon: 'fa-wallet', title: 'Fees & Finance', alert: hasFeeDues}, 
+                {id: 'exams', icon: 'fa-file-alt', title: 'Exam Marks', alert: false}, 
+                {id: 'activity', icon: 'fa-tasks', title: 'Daily Tasks', alert: false}
+            ];
+            
+            let content = ''; 
+            if(window.parentTab === 'fees') content = window.renderParentFees(std, fin); 
+            else if(window.parentTab === 'exams') content = window.renderParentExams(std); 
+            else if(window.parentTab === 'activity') content = window.renderParentDailyActivity(std); 
+            
+            return `
+                <div class="max-w-5xl mx-auto"><div class="bg-white rounded-2xl shadow-sm border mb-6 overflow-hidden"><div class="bg-[#022c22] p-6 text-white flex flex-col md:flex-row items-center gap-4 relative"><div class="relative w-24 h-24 flex-shrink-0 group"><div class="w-full h-full bg-white text-[#064e3b] rounded-full flex items-center justify-center text-4xl font-black shadow-lg overflow-hidden border-4 border-emerald-500/30">${std.photo ? `<img src="${std.photo}" class="w-full h-full object-cover">` : std.name.charAt(0)}</div><label class="absolute bottom-0 right-0 bg-amber-500 text-white rounded-full p-2 cursor-pointer shadow-lg hover:bg-amber-600 transition z-10" title="Change Profile Photo"><i class="fas fa-camera text-sm"></i><input type="file" accept="image/*" class="hidden" onchange="window.uploadStudentPhoto(this)"></label></div><div class="text-center md:text-left flex-1"><h2 class="text-2xl font-black">${std.name}</h2><p class="text-emerald-300 font-bold text-sm mt-1">Class: ${std.class} | Adm No: ${std.admNo}</p></div><button onclick="window.changeParentPassword()" class="bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-sm"><i class="fas fa-key"></i> Change Password</button></div>
+                <div class="flex overflow-x-auto border-b scroll-smooth">${tabs.map(t => `<button onclick="window.setParentTab('${t.id}')" class="parent-tab flex-1 min-w-[95px] py-4 text-center font-bold text-sm relative ${window.parentTab === t.id ? 'active' : 'text-slate-500 hover:bg-slate-50'}"><i class="fas ${t.icon} block text-2xl mb-2 ${t.alert ? 'animate-bounce text-rose-500' : ''}"></i> ${t.title} ${t.alert ? `<span class="absolute top-2 right-1/4 w-3 h-3 bg-rose-500 rounded-full shadow border-2 border-white"></span>` : ''}</button>`).join('')}</div></div>
+                <div class="pb-10">${content}</div></div>
+            `;
+        }
+
+        window.renderParentDailyActivity = function(std) {
+            let taskRows = '';
+            const stdTasks = (db.classTasks || []).filter(t => t.class === std.class).sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            stdTasks.forEach(t => {
+                const resp = std.taskUpdates && std.taskUpdates[t.id];
+                let statBadge = `<span class="px-2 py-1 rounded text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">Pending</span>`;
+                if(resp && resp.status === 'Completed') statBadge = `<span class="px-2 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Completed</span>`;
+                else if(resp && resp.status === 'Not Completed') statBadge = `<span class="px-2 py-1 rounded text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">Not Completed</span>`;
+                
+                taskRows += `<div class="bg-white p-5 rounded-xl border shadow-sm flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+                    <div class="flex-1">
+                        <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md mb-2 inline-block">${t.date}</span>
+                        <h4 class="font-bold text-slate-800 text-base">${t.task}</h4>
+                        <p class="text-xs text-slate-500 mt-1">Status: ${statBadge}</p>
+                        ${resp && resp.note ? `<p class="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded border"><b>Your Note:</b> ${resp.note}</p>` : ''}
+                    </div>
+                    <div class="w-full md:w-auto bg-slate-50 p-3 rounded-lg border">
+                        <label class="text-xs font-bold text-slate-500 block mb-1">Update Status</label>
+                        <select id="ptStat_${t.id}" class="w-full border p-2 rounded-lg text-sm bg-white font-bold outline-none mb-2">
+                            <option value="">-Select-</option>
+                            <option value="Completed" ${resp && resp.status === 'Completed' ? 'selected' : ''}>പൂർത്തിയാക്കി (Completed)</option>
+                            <option value="Not Completed" ${resp && resp.status === 'Not Completed' ? 'selected' : ''}>ചെയ്തിട്ടില്ല (Not Completed)</option>
+                        </select>
+                        <input type="text" id="ptNote_${t.id}" value="${resp ? (resp.note || '') : ''}" placeholder="കുറിപ്പ് (Optional)..." class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
+                        <button onclick="window.saveParentTaskResp('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">Save Response</button>
+                    </div>
+                </div>`;
+            });
+
+            if(!taskRows) taskRows = `<div class="text-center p-8 bg-white rounded-xl border text-slate-400 font-bold">ക്ലാസ്സിലേക്ക് പുതിയ ടാസ്കുകൾ ഒന്നും നൽകിയിട്ടില്ല. (No daily tasks assigned yet.)</div>`;
+
+            return `<div class="space-y-4">
+                <div class="bg-indigo-50 border border-indigo-200 p-5 rounded-xl shadow-sm">
+                    <h3 class="font-black text-indigo-800 text-lg"><i class="fas fa-tasks mr-2"></i>Daily Tasks (വീട്ടുവിശേഷങ്ങൾ)</h3>
+                    <p class="text-xs text-indigo-600 font-bold mt-1">ക്ലാസ്സിൽ നിന്നും നൽകുന്ന ടാസ്കുകൾ ഇവിടെ കാണാം. വിദ്യാർത്ഥി അത് പൂർത്തിയാക്കിയോ എന്ന് രേഖപ്പെടുത്തുക.</p>
+                </div>
+                ${taskRows}
+            </div>`;
+        }
+
+        window.renderAdminNotices = function() { return ''; }
+
+        window.postNotice = function(e){ e.preventDefault(); db.notices.push({id:Date.now(), date: new Date().toISOString().split('T')[0], title: document.getElementById('nTitle').value, content: document.getElementById('nContent').value}); window.saveDB(); window.renderApp(); window.showToast('Notice Published'); }
+        window.deleteNotice = function(id){ if(confirm('Delete notice?')) { db.notices = db.notices.filter(n=>n.id!==id); window.saveDB(); window.renderApp(); } }
+
+        window.deleteStudent = function(admNo) { if(confirm('Are you sure?')) { db.students = db.students.filter(s => String(s.admNo) !== String(admNo)); window.saveDB(); window.renderApp(); window.showToast('Student Deleted'); } }
+        window.openEditStudent = function(admNo) { const std = db.students.find(s => String(s.admNo) === String(admNo)); if(!std) return; document.getElementById('editAdm').value = std.admNo; document.getElementById('editName').value = std.name; document.getElementById('editClass').value = std.class; document.getElementById('editYearlyFee').value = std.yearlyFee || 0; document.getElementById('editMonthlyFee').value = std.monthlyFee || 0; document.getElementById('editTotalPaid').value = std.totalPaid || 0; document.getElementById('editFeeStart').value = std.feeStartDate || ''; document.getElementById('editDueDay').value = std.dueDay || 10; document.getElementById('editPhone').value = std.phone || ''; document.getElementById('editStdModal').classList.remove('hidden'); document.getElementById('editStdModal').classList.add('flex'); }
+        window.handleSaveEditStudent = function(e) { e.preventDefault(); const admNo = document.getElementById('editAdm').value; const std = db.students.find(s => String(s.admNo) === String(admNo)); if(std) { std.name = document.getElementById('editName').value.trim(); std.class = document.getElementById('editClass').value.trim(); std.yearlyFee = parseInt(document.getElementById('editYearlyFee').value) || 0; std.monthlyFee = parseInt(document.getElementById('editMonthlyFee').value) || 0; std.totalPaid = parseInt(document.getElementById('editTotalPaid').value) || 0; std.feeStartDate = document.getElementById('editFeeStart').value.trim(); std.dueDay = parseInt(document.getElementById('editDueDay').value) || 10; std.phone = document.getElementById('editPhone').value.trim(); window.saveDB(); window.showToast('Profile Updated'); document.getElementById('editStdModal').classList.add('hidden'); document.getElementById('editStdModal').classList.remove('flex'); window.searchStudent(admNo); } }
+        window.handleAddStudent = function(e) { e.preventDefault(); const adm = document.getElementById('newAdm').value.trim(); const name = document.getElementById('newName').value.trim(); const cls = document.getElementById('newClass').value.trim(); const yearlyFee = parseInt(document.getElementById('newYearlyFee').value) || 0; const monthlyFee = parseInt(document.getElementById('newMonthlyFee').value) || 0; const feeStartDate = document.getElementById('newFeeStart').value; const dueDay = parseInt(document.getElementById('newDueDay').value) || 10; const phone = document.getElementById('newPhone').value.trim(); if(!adm || !name || !cls || !feeStartDate) return alert('Fill all required fields!'); if(db.students.find(s => String(s.admNo) === String(adm))) return alert('Adm No exists!'); db.students.push({ admNo: adm, password: adm, name: name, class: cls, yearlyFee: yearlyFee, monthlyFee: monthlyFee, totalPaid: 0, feeStartDate: feeStartDate, dueDay: dueDay, phone: phone, leaveStatus: 'In Campus', leaveHistory: [], disciplineRecords: [], achievements: [], examMarks: {}, taskUpdates: {} }); window.saveDB(); window.showToast('Student added!'); document.getElementById('addStdModal').classList.add('hidden'); document.getElementById('addStdModal').classList.remove('flex'); window.renderApp(); }
+        window.downloadCSVTemplate = function() { const type = document.getElementById('csvUploadType').value; let headers, sample, filename; if (type === 'students') { headers = "adm No,password,name,class,yearly Fee,monthly Fee,total Paid,fee Start Date,due Day,phone\n"; sample = `1004,1004,Muhammed Ali,Class 8,4800,400,0,01 June 2026,10,9876543210\n`; filename = 'msm_students_template.csv'; } else if (type === 'records') { headers = "adm No,record type (discipline/achievement),date,time (optional),note\n"; sample = `1004,discipline,04 Sep 2026,10:30 AM,Late for class\n`; filename = 'msm_records_template.csv'; } else if (type === 'leaves') { headers = "adm No,action (OUT/IN),date,time (optional),reason (optional for IN)\n"; sample = `1004,OUT,04 Sep 2026,04:00 PM,Going home for weekend\n`; filename = 'msm_leaves_template.csv'; } const blob = new Blob([headers + sample], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', filename); a.click(); }
+        
+        window.handleCSVUpload = function() {
+            const fileInput = document.getElementById('csvFileInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                return window.showToast('Please select a CSV file first!', 'error');
+            }
+            const file = fileInput.files[0];
+            const type = document.getElementById('csvUploadType').value;
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+                if (lines.length <= 1) return window.showToast('CSV is empty or only has headers!', 'error');
+                
+                let successCount = 0; let errorCount = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const row = lines[i].split(',').map(item => item.trim());
+                    if(row.length < 2) continue;
+
+                    if (type === 'students') {
+                        const [adm, pass, name, cls, yFee, mFee, tPaid, fStart, dDay, phone] = row;
+                        if (!adm || !name || !cls) { errorCount++; continue; }
+                        if (db.students.find(s => String(s.admNo) === String(adm))) { errorCount++; continue; }
+                        
+                        db.students.push({
+                            admNo: adm, password: pass || adm, name: name, class: cls, yearlyFee: parseInt(yFee) || 0, monthlyFee: parseInt(mFee) || 0, totalPaid: parseInt(tPaid) || 0, feeStartDate: fStart || new Date().toISOString().split('T')[0], dueDay: parseInt(dDay) || 10, phone: phone || '', leaveStatus: 'In Campus', leaveHistory: [], disciplineRecords: [], achievements: [], examMarks: {}, taskUpdates: {}
+                        });
+                        successCount++;
+                    } 
+                    else if (type === 'records') {
+                        const [adm, recType, date, time, note] = row;
+                        const std = db.students.find(s => String(s.admNo) === String(adm));
+                        if (!std || !note || !recType) { errorCount++; continue; }
+                        
+                        const recordObj = { date: date || new Date().toISOString().split('T')[0], note: note + (time ? ` (${time})` : ''), addedBy: window.currentUser.name + ' (Bulk CSV)' };
+                        
+                        if (recType.toLowerCase().includes('discipline')) { std.disciplineRecords.push(recordObj); successCount++; } 
+                        else if (recType.toLowerCase().includes('achievement')) { std.achievements.push(recordObj); successCount++; } 
+                        else { errorCount++; }
+                    } 
+                    else if (type === 'leaves') {
+                        const [adm, action, date, time, reason] = row;
+                        const std = db.students.find(s => String(s.admNo) === String(adm));
+                        if (!std || !action) { errorCount++; continue; }
+                        
+                        const act = action.toUpperCase();
+                        const dt = date || new Date().toISOString().split('T')[0];
+                        
+                        if (act === 'OUT') { std.leaveStatus = 'On Leave'; std.leaveHistory.push({ dateOut: dt, reason: reason || 'Bulk CSV Upload', dateIn: null }); successCount++; } 
+                        else if (act === 'IN') { std.leaveStatus = 'In Campus'; const lastLeave = std.leaveHistory[std.leaveHistory.length - 1]; if (lastLeave && !lastLeave.dateIn) { lastLeave.dateIn = dt; } successCount++; } 
+                        else { errorCount++; }
+                    }
+                }
+                
+                if (successCount > 0) {
+                    window.saveDB(); window.showToast(`Successfully uploaded ${successCount} rows! (${errorCount} skipped)`);
+                    document.getElementById('bulkUploadModal').classList.add('hidden'); document.getElementById('bulkUploadModal').classList.remove('flex'); fileInput.value = ''; window.renderApp();
+                } else { window.showToast(`Upload failed. Check format or duplicates. (${errorCount} skipped)`, 'error'); }
+            };
+            reader.readAsText(file);
+        };
+
+        window.encodeImage = function(input, targetId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const driveUrl = await window.uploadToDrive(e.target.result, file.name);
+                    if (driveUrl) { document.getElementById(targetId).value = driveUrl; }
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        window.encodeFile = window.encodeImage;
+
+        window.saveSettings = function(e) {
+            e.preventDefault();
+            db.settings.logo = document.getElementById('sLogo').value;
+            db.settings.bg = document.getElementById('sBg').value;
+            db.settings.isVideoBg = document.querySelector('input[name="bgType"]:checked').value === 'video';
+            db.settings.bankName = document.getElementById('sBank').value;
+            db.settings.accName = document.getElementById('sAccN').value;
+            db.settings.accNo = document.getElementById('sAcc').value;
+            db.settings.ifsc = document.getElementById('sIfsc').value;
+            db.settings.upi = document.getElementById('sUpi').value;
+            db.settings.qrCodeUrl = document.getElementById('sQr').value;
+            window.saveDB(); window.initBranding(); window.showToast('Settings Saved!');
+        };
+
+        loadDatabase();
+    </script>
+</body>
+</html>
