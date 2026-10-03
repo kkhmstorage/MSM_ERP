@@ -17,7 +17,7 @@
 
 ## 🚀 Live Demo
 
-🔗 [https://kkkhmstorage.github.io/MSM-ERP](https://kkkhmstorage.github.io/MSM-ERP)
+🔗 [https://kkhmstorage.github.io/MSM_ERP/](https://kkhmstorage.github.io/MSM_ERP/)
 
 ## 🛠️ Technology Stack
 
