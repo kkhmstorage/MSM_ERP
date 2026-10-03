@@ -116,6 +116,39 @@
     
     <div id="feeModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col"><div class="bg-indigo-600 p-4 flex justify-between items-center text-white"><h3 class="font-bold"><i class="fas fa-wallet mr-2"></i>Record Fee Payment</h3><button onclick="document.getElementById('feeModal').classList.add('hidden'); document.getElementById('feeModal').classList.remove('flex');" class="text-xl">&times;</button></div><form onsubmit="window.submitFeePayment(event)" class="p-6 space-y-4 bg-slate-50"><input type="hidden" id="feeAdmNo"><div><label class="text-xs font-bold text-slate-500">Amount Paid (₹)</label><input type="number" required id="feeAmount" class="w-full border p-3 rounded-xl text-sm bg-white font-bold" min="1"></div><div><label class="text-xs font-bold text-slate-500">For Month & Year (മാസം & വർഷം)</label><input type="month" required id="feeMonthYear" class="w-full border p-3 rounded-xl text-sm bg-white font-bold"></div><div><label class="text-xs font-bold text-slate-500">Payment Note / Mode (Optional)</label><input type="text" id="feeNote" placeholder="Cash / GPay / Receipt No..." class="w-full border p-3 rounded-xl text-sm bg-white"></div><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2">Save Payment</button></form></div></div>
 
+    <!-- Add Achievement Modal -->
+    <div id="addAchievementModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-4 flex justify-between items-center text-white flex-shrink-0">
+                <h3 class="font-bold flex items-center gap-2"><i class="fas fa-trophy"></i> പുതിയ അച്ചീവ്മെന്റ് ചേർക്കുക</h3>
+                <button type="button" onclick="document.getElementById('addAchievementModal').classList.add('hidden'); document.getElementById('addAchievementModal').classList.remove('flex');" class="text-xl hover:text-amber-200 transition">&times;</button>
+            </div>
+            <form onsubmit="window.saveNewAchievement(event)" class="p-6 space-y-4 bg-slate-50 overflow-y-auto">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">ക്ലാസ് തിരഞ്ഞെടുക്കുക (Class)</label>
+                    <select id="achClsSelect" onchange="window.updateAchieveStudents()" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold" required></select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">വിദ്യാർത്ഥി (Student)</label>
+                    <select id="achStdSelect" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold" required></select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">നേട്ടം / അച്ചീവ്മെന്റ് (Title / Event)</label>
+                    <input id="achNote" placeholder="ഉദാ: ഖുർആൻ ഹിഫ്ള് പൂർത്തിയാക്കി / ദഅ്‌വാ ഫെസ്റ്റ് ഒന്നാം സ്ഥാനം" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">വിഭാഗം / റിമാർക്ക് (Remarks / Category)</label>
+                    <input id="achRemark" placeholder="ഉദാ: State Level / Best Conduct / First Prize" class="w-full border p-2.5 rounded-lg text-sm bg-white">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">തീയതി (Date)</label>
+                    <input id="achDate" type="date" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold" required>
+                </div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl mt-4 shadow-md transition">Save Achievement</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -392,12 +425,43 @@
             if (window.currentUser.role !== 'parent') window.currentTab = menu[0].id;
 
             menu.forEach(item => {
-                const btn = document.createElement('button'); btn.className = `nav-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 ${window.currentTab === item.id ? 'active' : ''}`;
+                const btn = document.createElement('button'); 
+                btn.className = `nav-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 ${window.currentTab === item.id ? 'active' : ''}`;
+                btn.setAttribute('data-tab', item.id);
                 btn.innerHTML = `<i class="fas ${item.icon} w-5 text-center"></i> ${item.label}`;
-                btn.onclick = () => { window.currentTab = item.id; document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); if(window.innerWidth < 768) window.toggleSidebar(); window.renderApp(); };
+                btn.onclick = () => { 
+                    window.setTab(item.id); 
+                    if(window.innerWidth < 768) window.toggleSidebar(); 
+                };
                 nav.appendChild(btn);
             });
         }
+
+        window.setTab = function(tabId) {
+            window.currentTab = tabId;
+            document.querySelectorAll('.nav-item').forEach(b => {
+                if(b.getAttribute('data-tab') === tabId) {
+                    b.classList.add('active');
+                } else {
+                    b.classList.remove('active');
+                }
+            });
+            window.renderApp();
+        };
+
+        window.openStudentDirectly = function(admNo, className) {
+            window.setTab('search');
+            setTimeout(() => {
+                const clsSel = document.getElementById('searchClass');
+                if (clsSel) {
+                    clsSel.value = className;
+                    window.updateSearchNames();
+                    const nameSel = document.getElementById('searchName');
+                    if (nameSel) nameSel.value = admNo;
+                }
+                window.searchStudent(admNo);
+            }, 60);
+        };
 
         window.renderApp = function() {
             const content = document.getElementById('mainContent'); let html = '';
@@ -1915,10 +1979,548 @@
             </div>`;
         }
 
-        window.renderAdminNotices = function() { return ''; }
+        // ================= NOTICE BOARD =================
+        window.renderAdminNotices = function() {
+            const notices = (db.notices || []).slice().sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+            const isAdmin = window.currentUser.role === 'admin' || window.currentUser.role === 'admin1';
 
-        window.postNotice = function(e){ e.preventDefault(); db.notices.push({id:Date.now(), date: new Date().toISOString().split('T')[0], title: document.getElementById('nTitle').value, content: document.getElementById('nContent').value}); window.saveDB(); window.renderApp(); window.showToast('Notice Published'); }
-        window.deleteNotice = function(id){ if(confirm('Delete notice?')) { db.notices = db.notices.filter(n=>n.id!==id); window.saveDB(); window.renderApp(); } }
+            return `
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-bullhorn text-indigo-600"></i> നോട്ടീസ് ബോർഡ് (Notice Board)
+                        </h2>
+                        <p class="text-xs font-bold text-slate-500 mt-1">മദ്രസയിലെ പ്രധാന അറിയിപ്പുകളും ഔദ്യോഗിക വിവരങ്ങളും</p>
+                    </div>
+                    <div class="text-xs font-bold bg-white px-3 py-1.5 rounded-xl border shadow-sm text-slate-600">
+                        ആകെ നോട്ടീസുകൾ: <span class="font-black text-indigo-600">${notices.length}</span>
+                    </div>
+                </div>
+
+                <!-- Post Notice Form (For Admins) -->
+                ${isAdmin ? `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                    <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-emerald-600"></i> പുതിയ നോട്ടീസ് പ്രസിദ്ധീകരിക്കുക (Post New Notice)
+                    </h3>
+                    <form onsubmit="window.postNotice(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">നോട്ടീസ് തലക്കെട്ട് (Notice Title)</label>
+                            <input required id="nTitle" placeholder="ഉദാ: പെരുന്നാൾ അവധി അറിയിപ്പ് / പരീക്ഷാ തീയതികൾ" class="w-full border p-3 rounded-xl text-sm font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">വിശദാംശങ്ങൾ (Notice Content)</label>
+                            <textarea required id="nContent" rows="4" placeholder="അറിയിപ്പിന്റെ വിശദമായ വിവരങ്ങൾ ഇവിടെ എഴുതുക..." class="w-full border p-3 rounded-xl text-sm bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-md transition flex items-center gap-2">
+                                <i class="fas fa-paper-plane"></i> പ്രസിദ്ധീകരിക്കുക (Publish Notice)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                ` : ''}
+
+                <!-- Notices Feed -->
+                <div class="space-y-4">
+                    ${notices.length > 0 ? notices.map(n => `
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-indigo-600"></div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-black inline-flex items-center gap-1.5 border border-indigo-100">
+                                    <i class="fas fa-calendar-alt text-indigo-500"></i> ${n.date || 'Today'}
+                                </span>
+                                <span class="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded text-[11px] font-bold border border-emerald-100">Official Notice</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.printNotice('${n.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                ${isAdmin ? `
+                                <button onclick="window.deleteNotice('${n.id}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 mb-2">${n.title}</h4>
+                        <div class="text-sm text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">${n.content}</div>
+                    </div>
+                    `).join('') : `
+                    <div class="p-12 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 font-bold shadow-sm">
+                        <i class="fas fa-bullhorn text-4xl mb-3 text-slate-300 block"></i>
+                        നിലവിൽ നോട്ടീസുകളൊന്നും പ്രസിദ്ധീകരിച്ചിട്ടില്ല. (No notices published yet.)
+                    </div>
+                    `}
+                </div>
+            </div>
+            `;
+        };
+
+        window.postNotice = function(e) { 
+            e.preventDefault(); 
+            const titleInput = document.getElementById('nTitle');
+            const contentInput = document.getElementById('nContent');
+            if(!titleInput || !contentInput) return;
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            if(!title || !content) return alert('ദയവായി തലക്കെട്ടും വിവരങ്ങളും നൽകുക!');
+
+            if(!db.notices) db.notices = [];
+            db.notices.push({
+                id: Date.now(), 
+                date: new Date().toISOString().split('T')[0], 
+                title: title, 
+                content: content,
+                postedBy: window.currentUser ? window.currentUser.name : 'Admin'
+            }); 
+            window.saveDB(); 
+            window.showToast('Notice Published Successfully!'); 
+            window.renderApp(); 
+        };
+
+        window.deleteNotice = function(id) { 
+            if(confirm('ഈ നോട്ടീസ് ഡിലീറ്റ് ചെയ്യണോ?')) { 
+                db.notices = (db.notices || []).filter(n => String(n.id) !== String(id)); 
+                window.saveDB(); 
+                window.showToast('Notice Deleted', 'error'); 
+                window.renderApp(); 
+            } 
+        };
+
+        window.printNotice = function(id) {
+            const n = (db.notices || []).find(item => String(item.id) === String(id));
+            if(!n) return;
+            const html = `
+            <div style="max-width: 750px; margin: auto; padding: 35px; border: 3px double #022c22; border-radius: 12px; font-family: Arial, sans-serif;">
+                <div class="header" style="margin-bottom: 20px; border-bottom: 2px solid #022c22; padding-bottom: 12px; text-align: center;">
+                    <h2 class="title" style="margin: 0; font-size: 24px; color: #022c22;">MUHYISSUNNA SECONDARY MADRASA</h2>
+                    <p class="subtitle" style="margin: 4px 0 0 0; font-size: 13px; color: #555;">Moochikkal, Valanchery | Affiliation No: 171 (Samastha Kerala Islamatha Vidhyabyasa Board)</p>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px dashed #ccc; padding-bottom: 8px;">
+                    <span>Official Announcement / അറിയിപ്പ്</span>
+                    <span>Date: <b>${n.date || new Date().toLocaleDateString('en-GB')}</b></span>
+                </div>
+                <div style="text-align: center; margin: 25px 0;">
+                    <h1 style="font-size: 20px; font-weight: 900; color: #022c22; text-decoration: underline; margin-bottom: 10px;">${n.title}</h1>
+                </div>
+                <div style="font-size: 15px; line-height: 1.9; color: #222; white-space: pre-line; background: #fafafa; padding: 25px; border-radius: 8px; border: 1px solid #eee;">
+                    ${n.content}
+                </div>
+                <div style="margin-top: 60px; display: flex; justify-content: space-between; font-size: 13px; font-weight: bold;">
+                    <div>
+                        <p style="border-top: 1px solid #888; padding-top: 5px; width: 140px; text-align: center;">Office In-Charge</p>
+                    </div>
+                    <div>
+                        <p style="border-top: 1px solid #888; padding-top: 5px; width: 140px; text-align: center;">Sadr Muallim / Principal</p>
+                    </div>
+                </div>
+            </div>
+            `;
+            window.openPrintWindow(html, `Notice_${n.title.replace(/\s+/g, '_')}`);
+        };
+
+        // ================= ACHIEVEMENTS =================
+        window.achieveClassFilter = 'all';
+        window.achieveSearchQuery = '';
+
+        window.renderGlobalAchievements = function() {
+            const classes = [...new Set(db.students.map(s => s.class))].filter(Boolean).sort();
+            
+            let allAch = [];
+            db.students.forEach(s => {
+                (s.achievements || []).forEach(a => {
+                    allAch.push({
+                        admNo: s.admNo,
+                        name: s.name,
+                        class: s.class,
+                        photo: s.photo,
+                        phone: s.phone,
+                        ...a
+                    });
+                });
+            });
+            allAch.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+            let filtered = allAch;
+            if (window.achieveClassFilter && window.achieveClassFilter !== 'all') {
+                filtered = filtered.filter(a => a.class === window.achieveClassFilter);
+            }
+            if (window.achieveSearchQuery) {
+                const q = window.achieveSearchQuery.toLowerCase();
+                filtered = filtered.filter(a => a.name.toLowerCase().includes(q) || a.note.toLowerCase().includes(q) || (a.remark && a.remark.toLowerCase().includes(q)));
+            }
+
+            const totalHonouredStudents = new Set(allAch.map(a => a.admNo)).size;
+
+            return `
+            <div class="max-w-6xl mx-auto space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-trophy text-amber-500"></i> വിദ്യാർത്ഥി അച്ചീവ്മെന്റുകൾ (Student Achievements)
+                        </h2>
+                        <p class="text-xs font-bold text-slate-500 mt-1">വിദ്യാർത്ഥികളുടെ പഠന-പാഠ്യേതര മികവുകളും അംഗീകാരങ്ങളും</p>
+                    </div>
+                    <button onclick="window.openAddAchievementModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> പുതിയ അച്ചീവ്മെന്റ് ചേർക്കുക
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-xl font-black shadow-inner">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase">ആകെ നേട്ടങ്ങൾ (Total)</p>
+                            <p class="text-2xl font-black text-slate-800">${allAch.length} <span class="text-xs font-normal text-slate-400">നേട്ടങ്ങൾ</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl font-black shadow-inner">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase">നേട്ടം കരസ്ഥമാക്കിയവർ</p>
+                            <p class="text-2xl font-black text-emerald-600">${totalHonouredStudents} <span class="text-xs font-normal text-slate-400">കുട്ടികൾ</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl font-black shadow-inner">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase">ബാച്ചുകൾ (Classes)</p>
+                            <p class="text-2xl font-black text-indigo-600">${classes.length} <span class="text-xs font-normal text-slate-400">ക്ലാസുകൾ</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center">
+                    <div class="w-full md:w-56">
+                        <select onchange="window.achieveClassFilter=this.value; window.renderApp();" class="w-full border p-2.5 rounded-xl text-sm font-bold bg-slate-50 text-slate-700 outline-none">
+                            <option value="all" ${window.achieveClassFilter === 'all' ? 'selected' : ''}>എല്ലാ ക്ലാസുകളും (All Classes)</option>
+                            ${classes.map(c => `<option value="${c}" ${c === window.achieveClassFilter ? 'selected' : ''}>${c}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="w-full flex-1">
+                        <input type="text" value="${window.achieveSearchQuery}" oninput="window.achieveSearchQuery=this.value; window.renderApp();" placeholder="വിദ്യാർത്ഥിയുടെ പേരോ നേട്ടമോ തിരയുക..." class="w-full border p-2.5 rounded-xl text-sm bg-slate-50 outline-none">
+                    </div>
+                </div>
+
+                <!-- Achievements Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    ${filtered.length > 0 ? filtered.map(a => `
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-5 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-amber-50 rounded-bl-full flex items-start justify-end p-2 text-amber-500">
+                            <i class="fas fa-award text-xl"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg font-black uppercase overflow-hidden border-2 border-indigo-200 flex-shrink-0">
+                                    ${a.photo ? `<img src="${a.photo}" class="w-full h-full object-cover">` : a.name.charAt(0)}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-black text-slate-800 text-base truncate">${a.name}</h4>
+                                    <p class="text-xs text-slate-500 font-bold">${a.class} • Adm: ${a.admNo}</p>
+                                </div>
+                            </div>
+                            <div class="bg-amber-50/70 border border-amber-200/60 rounded-xl p-3 mb-3">
+                                <span class="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded uppercase inline-block mb-1">
+                                    <i class="fas fa-trophy mr-1"></i> ${a.remark || 'Achievement'}
+                                </span>
+                                <h5 class="font-black text-slate-800 text-sm leading-snug">${a.note}</h5>
+                            </div>
+                            <div class="flex justify-between items-center text-[11px] text-slate-400 font-bold">
+                                <span><i class="fas fa-calendar-alt mr-1"></i> ${a.date}</span>
+                                <span>${a.addedBy ? `By: ${a.addedBy}` : ''}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+                            <button onclick="window.printAchievementCertificate('${a.admNo}', '${a.date}')" class="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                                <i class="fas fa-certificate"></i> സർട്ടിഫിക്കറ്റ്
+                            </button>
+                            ${window.currentUser.role === 'admin' ? `
+                            <button onclick="window.deleteRecord('${a.admNo}', 'achievement', '${a.date}')" class="text-rose-500 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg text-xs font-bold transition border border-rose-200" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    `).join('') : `
+                    <div class="col-span-full p-12 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 font-bold shadow-sm">
+                        <i class="fas fa-trophy text-4xl mb-3 text-slate-300 block"></i>
+                        അച്ചീവ്മെന്റുകൾ ഒന്നും കണ്ടെത്തിയില്ല.
+                    </div>
+                    `}
+                </div>
+            </div>
+            `;
+        };
+
+        window.openAddAchievementModal = function() {
+            const classes = [...new Set(db.students.map(s => s.class))].filter(Boolean).sort();
+            const clsSelect = document.getElementById('achClsSelect');
+            if(clsSelect) {
+                clsSelect.innerHTML = `<option value="">-- Select Class --</option>` + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+            window.updateAchieveStudents();
+            const dateInput = document.getElementById('achDate');
+            if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+            document.getElementById('addAchievementModal').classList.remove('hidden');
+            document.getElementById('addAchievementModal').classList.add('flex');
+        };
+
+        window.updateAchieveStudents = function() {
+            const cls = document.getElementById('achClsSelect').value;
+            const stdSelect = document.getElementById('achStdSelect');
+            if(!stdSelect) return;
+            stdSelect.innerHTML = '<option value="">-- Select Student --</option>';
+            if(cls) {
+                db.students.filter(s => s.class === cls).sort((a,b) => a.name.localeCompare(b.name)).forEach(s => {
+                    stdSelect.innerHTML += `<option value="${s.admNo}">${s.name} (Adm: ${s.admNo})</option>`;
+                });
+            }
+        };
+
+        window.saveNewAchievement = function(e) {
+            e.preventDefault();
+            const adm = document.getElementById('achStdSelect').value;
+            const note = document.getElementById('achNote').value.trim();
+            const remark = document.getElementById('achRemark').value.trim();
+            const date = document.getElementById('achDate').value;
+            if(!adm || !note || !date) return alert('Fill required fields!');
+
+            const std = db.students.find(s => String(s.admNo) === String(adm));
+            if(!std) return alert('Student not found!');
+            if(!std.achievements) std.achievements = [];
+
+            std.achievements.push({
+                date: date,
+                note: note,
+                remark: remark,
+                addedBy: window.currentUser.name
+            });
+
+            window.saveDB();
+            window.showToast('Achievement Added Successfully!');
+            document.getElementById('addAchievementModal').classList.add('hidden');
+            document.getElementById('addAchievementModal').classList.remove('flex');
+            window.renderApp();
+        };
+
+        window.printAchievementCertificate = function(admNo, date) {
+            const std = db.students.find(s => String(s.admNo) === String(admNo));
+            if(!std) return;
+            const ach = (std.achievements || []).find(a => a.date === date) || { note: 'Special Achievement', remark: '' };
+            const today = new Date().toLocaleDateString('en-GB');
+
+            const html = `
+            <div style="max-width: 800px; margin: auto; padding: 40px; border: 8px double #b45309; border-radius: 16px; font-family: 'Times New Roman', serif; text-align: center; background: #fffbeb;">
+                <div style="margin-bottom: 25px;">
+                    <h2 style="font-size: 28px; color: #022c22; margin: 0; text-transform: uppercase; letter-spacing: 1px;">MUHYISSUNNA SECONDARY MADRASA</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666; font-style: italic;">Affiliated to Samastha Kerala Islamatha Vidhyabyasa Board (Aff No: 171) | Moochikkal, Valanchery</p>
+                </div>
+                <div style="margin: 25px auto 20px auto; border-top: 2px solid #b45309; border-bottom: 2px solid #b45309; padding: 10px 0; width: 60%;">
+                    <h1 style="font-size: 26px; color: #b45309; margin: 0; text-transform: uppercase; letter-spacing: 2px;">CERTIFICATE OF APPRECIATION</h1>
+                </div>
+                <p style="font-size: 16px; color: #555; margin-top: 25px;">This certificate is proudly awarded to</p>
+                <h2 style="font-size: 32px; color: #022c22; margin: 10px 0; text-decoration: underline;">${std.name}</h2>
+                <p style="font-size: 16px; color: #444; margin: 5px 0;">Admission No: <b>${std.admNo}</b> | Class: <b>${std.class}</b></p>
+                <p style="font-size: 18px; line-height: 1.8; color: #333; margin: 25px auto; max-width: 650px;">
+                    in recognition of the outstanding achievement in <b>${ach.note}</b> ${ach.remark ? `(${ach.remark})` : ''} on <b>${ach.date}</b>.
+                </p>
+                <div style="margin-top: 70px; display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; padding: 0 40px;">
+                    <div>
+                        <p style="border-top: 1px solid #333; padding-top: 5px; width: 150px;">Class Ustad</p>
+                    </div>
+                    <div>
+                        <p style="border-top: 1px solid #333; padding-top: 5px; width: 150px;">Date: ${today}</p>
+                    </div>
+                    <div>
+                        <p style="border-top: 1px solid #333; padding-top: 5px; width: 150px;">Sadr Muallim / Principal</p>
+                    </div>
+                </div>
+            </div>
+            `;
+            window.openPrintWindow(html, `Certificate_${std.name}`);
+        };
+
+        // ================= SETTINGS =================
+        window.renderSettings = function() {
+            const s = db.settings || DEFAULT_SETTINGS;
+            return `
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- Header -->
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-cog text-slate-700"></i> സിസ്റ്റം ക്രമീകരണങ്ങൾ (Settings)
+                        </h2>
+                        <p class="text-xs font-bold text-slate-500 mt-1">മദ്രസ ബ്രാൻഡിംഗ്, ബാങ്ക് അക്കൗണ്ട് വിവരങ്ങൾ, ബാക്കപ്പ് ക്രമീകരണങ്ങൾ</p>
+                    </div>
+                </div>
+
+                <form onsubmit="window.saveSettings(event)" class="space-y-6">
+                    <!-- Branding Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+                        <h3 class="text-base font-black text-slate-800 border-b pb-3 flex items-center gap-2">
+                            <i class="fas fa-palette text-indigo-600"></i> മദ്രസ ബ്രാൻഡിംഗും ലോഗോയും (Appearance & Branding)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">മദ്രസ ലോഗോ URL (Logo Image URL)</label>
+                                <div class="flex gap-2">
+                                    <input id="sLogo" value="${s.logo || ''}" placeholder="https://..." class="flex-1 border p-2.5 rounded-xl text-sm bg-slate-50 outline-none">
+                                    <label class="bg-slate-100 hover:bg-slate-200 border px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-upload"></i> Upload
+                                        <input type="file" accept="image/*" class="hidden" onchange="window.encodeImage(this, 'sLogo')">
+                                    </label>
+                                </div>
+                                <div class="mt-3 flex items-center gap-3">
+                                    <img src="${s.logo || ''}" class="w-12 h-12 rounded-xl border bg-white shadow-sm object-contain p-1" onerror="this.src='https://placehold.co/100x100?text=Logo'">
+                                    <span class="text-xs text-slate-400 font-bold">നിലവിലെ ലോഗോ പ്രിവ്യൂ</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">ലോഗിൻ ബാക്ക്ഗ്രൗണ്ട് URL (Background Image/Video URL)</label>
+                                <div class="flex gap-2">
+                                    <input id="sBg" value="${s.bg || ''}" placeholder="https://..." class="flex-1 border p-2.5 rounded-xl text-sm bg-slate-50 outline-none">
+                                    <label class="bg-slate-100 hover:bg-slate-200 border px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-upload"></i> Upload
+                                        <input type="file" accept="image/*" class="hidden" onchange="window.encodeImage(this, 'sBg')">
+                                    </label>
+                                </div>
+                                <div class="mt-3 flex items-center gap-4">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                                        <input type="radio" name="bgType" value="image" ${!s.isVideoBg ? 'checked' : ''} class="text-indigo-600 focus:ring-indigo-500">
+                                        <span>Image Background</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                                        <input type="radio" name="bgType" value="video" ${s.isVideoBg ? 'checked' : ''} class="text-indigo-600 focus:ring-indigo-500">
+                                        <span>Video Background</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank & Payment Settings Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+                        <div class="border-b pb-3">
+                            <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-university text-emerald-600"></i> ഫീസ് പേയ്‌മെന്റ് വിവരങ്ങൾ (Bank & UPI Settings)
+                            </h3>
+                            <p class="text-xs font-bold text-slate-500 mt-0.5">രക്ഷിതാക്കളുടെ പോർട്ടലിൽ ഫീസ് അടയ്ക്കാൻ കാണിക്കുന്ന ബാങ്ക് / UPI വിവരങ്ങൾ</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">ബാങ്കിന്റെ പേര് (Bank Name)</label>
+                                <input id="sBank" value="${s.bankName || ''}" placeholder="HDFC BANK" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50 font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">അക്കൗണ്ട് ഉടമയുടെ പേര് (Account Name)</label>
+                                <input id="sAccN" value="${s.accName || ''}" placeholder="MUHYISSUNNA SECONDARY MADRASA" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50 font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">അക്കൗണ്ട് നമ്പർ (Account Number)</label>
+                                <input id="sAcc" value="${s.accNo || ''}" placeholder="XXXXXXXXXXXXXX" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50 font-mono font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">IFSC കോഡ്</label>
+                                <input id="sIfsc" value="${s.ifsc || ''}" placeholder="HDFC000XXXX" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50 font-mono font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">UPI ID (VPA)</label>
+                                <input id="sUpi" value="${s.upi || ''}" placeholder="msm@hdfcbank" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50 font-mono font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">UPI QR Code ഇമേജ് URL</label>
+                                <div class="flex gap-2">
+                                    <input id="sQr" value="${s.qrCodeUrl || ''}" placeholder="https://..." class="flex-1 border p-2.5 rounded-xl text-sm bg-slate-50 outline-none">
+                                    <label class="bg-slate-100 hover:bg-slate-200 border px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-upload"></i> Upload
+                                        <input type="file" accept="image/*" class="hidden" onchange="window.encodeImage(this, 'sQr')">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-[#022c22] hover:bg-emerald-900 text-white font-bold px-8 py-3 rounded-xl text-sm shadow-md transition flex items-center gap-2">
+                            <i class="fas fa-save text-emerald-400"></i> സെറ്റിംഗ്സ് സേവ് ചെയ്യുക (Save All Settings)
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Data Backup & Safety Card -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                    <h3 class="text-base font-black text-slate-800 border-b pb-3 flex items-center gap-2">
+                        <i class="fas fa-database text-blue-600"></i> ഡാറ്റാബേസ് ബാക്കപ്പും സുരക്ഷയും (Backup & Restore)
+                    </h3>
+                    <p class="text-xs text-slate-500 font-bold leading-relaxed">
+                        മദ്രസയിലെ മുഴുവൻ വിദ്യാർത്ഥികൾ, ഫീസ് വിവരങ്ങൾ, പരീക്ഷകൾ, നോട്ടീസുകൾ എന്നിവയുടെ ഒരു ബാക്കപ്പ് കോപ്പി നിങ്ങളുടെ കമ്പ്യൂട്ടറിലേക്ക് ഡൗൺലോഡ് ചെയ്തു സൂക്ഷിക്കാം.
+                    </p>
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        <button onclick="window.downloadDatabaseBackup()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download Full Backup (JSON)
+                        </button>
+                        <label class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i class="fas fa-upload"></i> Restore from JSON Backup
+                            <input type="file" accept=".json" class="hidden" onchange="window.restoreDatabaseBackup(this)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            `;
+        };
+
+        window.downloadDatabaseBackup = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `MSM_ERP_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            window.showToast('Database Backup Downloaded!');
+        };
+
+        window.restoreDatabaseBackup = function(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if(!confirm('മുന്നറിയിപ്പ്: ബാക്കപ്പ് ഫയൽ റീസ്റ്റോർ ചെയ്താൽ നിലവിലെ എല്ലാ ഡാറ്റയും മാറ്റപ്പെടും. തുടരണോ?')) {
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported && imported.students && imported.settings) {
+                        db = imported;
+                        window.saveDB();
+                        window.initBranding();
+                        window.showToast('Database Restored Successfully!');
+                        window.renderApp();
+                    } else {
+                        alert('Invalid backup file format!');
+                    }
+                } catch(err) {
+                    alert('Error parsing JSON backup file!');
+                }
+            };
+            reader.readAsText(file);
+        };
 
         window.deleteStudent = function(admNo) { if(confirm('Are you sure?')) { db.students = db.students.filter(s => String(s.admNo) !== String(admNo)); window.saveDB(); window.renderApp(); window.showToast('Student Deleted'); } }
         window.openEditStudent = function(admNo) { 
