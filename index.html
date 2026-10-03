@@ -149,6 +149,80 @@
         </div>
     </div>
 
+    <!-- Add Teacher Modal -->
+    <div id="addTeacherModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-indigo-600 p-4 flex justify-between items-center text-white flex-shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-chalkboard-teacher"></i> പുതിയ അധ്യാപകനെ ചേർക്കുക (Add Teacher)</h3>
+                <button type="button" onclick="document.getElementById('addTeacherModal').classList.add('hidden'); document.getElementById('addTeacherModal').classList.remove('flex');" class="text-xl hover:text-indigo-200 transition">&times;</button>
+            </div>
+            <form id="tForm" onsubmit="window.addTeacher(event)" class="p-6 space-y-4 bg-slate-50 overflow-y-auto">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">അധ്യാപകന്റെ പേര് (Full Name)</label>
+                    <input required id="tName" placeholder="ഉദാ: ഉസ്താദ് മുഹമ്മദ് അലി" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">പഠിപ്പിക്കുന്ന വിഷയങ്ങൾ / ക്ലാസുകൾ (Subjects & Classes)</label>
+                    <input required id="tSubj" placeholder="ഉദാ: ഫിഖ്ഹ്, താരീഖ് (ക്ലാസ് 8, 9, 10)" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">ഫോൺ നമ്പർ (Phone Number - 10 Digits)</label>
+                    <input required id="tPhone" type="tel" placeholder="9876543210" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold font-mono outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">യോഗ്യത / വിവരണം (Qualification & Details - Optional)</label>
+                    <textarea id="tDetails" rows="2" placeholder="ഉദാ: വാഫി ബിരുദം, 7 വർഷത്തെ പരിചയം..." class="w-full border p-2.5 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">ഫോട്ടോ (Profile Photo - Optional)</label>
+                    <input type="file" id="tPhoto" accept="image/*" class="w-full border p-2 rounded-lg text-sm bg-white outline-none">
+                    <p class="text-[11px] text-slate-400 mt-1">ഫോട്ടോ നിർബന്ധമില്ല. നൽകാതിരുന്നാൽ പേരിന്റെ ആദ്യ അക്ഷരം കാണിക്കും.</p>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl mt-4 shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle"></i> Save Teacher Profile
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Teacher Modal -->
+    <div id="editTeacherModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-blue-600 p-4 flex justify-between items-center text-white flex-shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-edit"></i> അധ്യാപക വിവരങ്ങൾ തിരുത്തുക (Edit Teacher)</h3>
+                <button type="button" onclick="document.getElementById('editTeacherModal').classList.add('hidden'); document.getElementById('editTeacherModal').classList.remove('flex');" class="text-xl hover:text-blue-200 transition">&times;</button>
+            </div>
+            <form id="editTForm" onsubmit="window.saveEditTeacher(event)" class="p-6 space-y-4 bg-slate-50 overflow-y-auto">
+                <input type="hidden" id="editTId">
+                <input type="hidden" id="editTOldPhoto">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">അധ്യാപകന്റെ പേര് (Full Name)</label>
+                    <input required id="editTName" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">പഠിപ്പിക്കുന്ന വിഷയങ്ങൾ / ക്ലാസുകൾ (Subjects & Classes)</label>
+                    <input required id="editTSubj" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">ഫോൺ നമ്പർ (Phone Number)</label>
+                    <input required id="editTPhone" type="tel" class="w-full border p-2.5 rounded-lg text-sm bg-white font-bold font-mono outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">യോഗ്യത / വിവരണം (Qualification & Details)</label>
+                    <textarea id="editTDetails" rows="2" class="w-full border p-2.5 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">പുതിയ ഫോട്ടോ മാറ്റുക (Change Photo - Optional)</label>
+                    <input type="file" id="editTPhoto" accept="image/*" class="w-full border p-2 rounded-lg text-sm bg-white outline-none">
+                    <p class="text-[11px] text-slate-400 mt-1">ഫോട്ടോ മാറ്റേണ്ടതില്ലെങ്കിൽ ഇത് ഒഴിവാക്കാം.</p>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl mt-4 shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Update Teacher Profile
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -737,33 +811,167 @@
         }
 
         window.renderAdminTeachers = function() {
+            if(!db.teachers) db.teachers = [];
             return `<div class="max-w-6xl mx-auto space-y-6 flex flex-col h-full">
-                <div class="flex justify-between items-center"><h2 class="text-2xl font-extrabold text-slate-800">Manage Teachers</h2>${window.currentUser.role === 'admin' ? `<button onclick="document.getElementById('addTeacherModal').classList.remove('hidden'); document.getElementById('addTeacherModal').classList.add('flex');" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition">+ Add Teacher</button>` : ''}</div>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Manage Teachers</h2>
+                        <p class="text-xs font-bold text-slate-500 mt-0.5">മദ്രസയിലെ അധ്യാപകരുടെ വിവരങ്ങളും ഫോൺ നമ്പറുകളും</p>
+                    </div>
+                    ${window.currentUser.role === 'admin' ? `
+                    <button onclick="document.getElementById('addTeacherModal').classList.remove('hidden'); document.getElementById('addTeacherModal').classList.add('flex');" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Add Teacher
+                    </button>
+                    ` : ''}
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    ${db.teachers.map(t => `<div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col items-center text-center relative">
-                        ${window.currentUser.role === 'admin' ? `<div class="absolute top-4 right-4 flex gap-2"><button onclick="window.openEditTeacher('${t.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-lg transition" title="Edit Teacher"><i class="fas fa-edit"></i></button><button onclick="window.deleteTeacher('${t.id}')" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-lg transition" title="Delete Teacher"><i class="fas fa-trash"></i></button></div>` : ''}
-                        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-black uppercase mb-4 shadow-inner overflow-hidden border-2 border-indigo-200 mt-2">${t.photo ? `<img src="${t.photo}" class="w-full h-full object-cover">` : t.name.charAt(0)}</div>
-                        <h3 class="text-lg font-black text-slate-800">${t.name}</h3><p class="text-sm font-bold text-indigo-600 mt-1">${t.subjects}</p><p class="text-xs text-slate-500 mt-2 line-clamp-2">${t.details}</p>
-                        <div class="flex gap-2 mt-4 w-full"><a href="tel:${t.phone}" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-bold transition flex justify-center items-center gap-1"><i class="fas fa-phone"></i> Call</a><a href="https://wa.me/91${t.phone}" target="_blank" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 py-2 rounded-lg text-xs font-bold transition flex justify-center items-center gap-1"><i class="fab fa-whatsapp"></i> WhatsApp</a></div>
-                    </div>`).join('') || '<p class="col-span-full text-center p-8 text-slate-500 bg-white rounded-xl border font-bold">No teachers added yet.</p>'}
-                </div></div>`;
-        }
+                    ${db.teachers.map(t => {
+                        const cleanPhone = (t.phone || '').replace(/[^0-9]/g, '');
+                        const waNum = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+                        return `
+                        <div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col items-center text-center relative hover:shadow-md transition">
+                            ${window.currentUser.role === 'admin' ? `
+                            <div class="absolute top-4 right-4 flex gap-2">
+                                <button onclick="window.openEditTeacher('${t.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-lg transition" title="Edit Teacher"><i class="fas fa-edit"></i></button>
+                                <button onclick="window.deleteTeacher('${t.id}')" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-lg transition" title="Delete Teacher"><i class="fas fa-trash"></i></button>
+                            </div>
+                            ` : ''}
+                            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-black uppercase mb-4 shadow-inner overflow-hidden border-2 border-indigo-200 mt-2">
+                                ${t.photo ? `<img src="${t.photo}" class="w-full h-full object-cover">` : (t.name ? t.name.charAt(0) : 'T')}
+                            </div>
+                            <h3 class="text-lg font-black text-slate-800">${t.name}</h3>
+                            <p class="text-sm font-bold text-indigo-600 mt-1">${t.subjects}</p>
+                            <p class="text-xs text-slate-500 mt-2 line-clamp-2">${t.details || ''}</p>
+                            <div class="flex gap-2 mt-4 w-full">
+                                <a href="tel:${cleanPhone}" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-bold transition flex justify-center items-center gap-1.5 shadow-sm">
+                                    <i class="fas fa-phone text-indigo-600"></i> Call
+                                </a>
+                                <a href="https://wa.me/${waNum}" target="_blank" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 py-2 rounded-lg text-xs font-bold transition flex justify-center items-center gap-1.5 shadow-sm">
+                                    <i class="fab fa-whatsapp text-emerald-600"></i> WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                        `;
+                    }).join('') || '<div class="col-span-full text-center p-12 text-slate-400 bg-white rounded-2xl border font-bold shadow-sm"><i class="fas fa-chalkboard-teacher text-4xl text-slate-300 block mb-2"></i>അധ്യാപകരെ ആരെയും ചേർത്തിട്ടില്ല. (+ Add Teacher ക്ലിക്ക് ചെയ്യുക)</div>'}
+                </div>
+            </div>`;
+        };
 
         window.openEditTeacher = function(id) {
-            const t = db.teachers.find(teacher => teacher.id === id); if(!t) return;
-            document.getElementById('editTId').value = t.id; document.getElementById('editTName').value = t.name; document.getElementById('editTSubj').value = t.subjects; document.getElementById('editTPhone').value = t.phone; document.getElementById('editTDetails').value = t.details || ''; document.getElementById('editTOldPhoto').value = t.photo || '';
-            document.getElementById('editTeacherModal').classList.remove('hidden'); document.getElementById('editTeacherModal').classList.add('flex');
-        }
+            const t = db.teachers.find(teacher => String(teacher.id) === String(id)); 
+            if(!t) return;
+            document.getElementById('editTId').value = t.id; 
+            document.getElementById('editTName').value = t.name || ''; 
+            document.getElementById('editTSubj').value = t.subjects || ''; 
+            document.getElementById('editTPhone').value = t.phone || ''; 
+            document.getElementById('editTDetails').value = t.details || ''; 
+            document.getElementById('editTOldPhoto').value = t.photo || '';
+            document.getElementById('editTeacherModal').classList.remove('hidden'); 
+            document.getElementById('editTeacherModal').classList.add('flex');
+        };
 
         window.saveEditTeacher = function(e) {
-            e.preventDefault(); const id = document.getElementById('editTId').value; const name = document.getElementById('editTName').value.trim(); const subjects = document.getElementById('editTSubj').value.trim(); const phone = document.getElementById('editTPhone').value.trim(); const details = document.getElementById('editTDetails').value.trim(); const oldPhoto = document.getElementById('editTOldPhoto').value; const photoInput = document.getElementById('editTPhoto');
-            const teacher = db.teachers.find(t => t.id === id); if(!teacher) return;
-            const updateDB = (photoUrl) => { teacher.name = name; teacher.subjects = subjects; teacher.phone = phone; teacher.details = details; teacher.photo = photoUrl; window.saveDB(); window.showToast('Teacher Updated Successfully!'); document.getElementById('editTeacherModal').classList.add('hidden'); document.getElementById('editTeacherModal').classList.remove('flex'); document.getElementById('editTForm').reset(); window.renderApp(); };
-            if(photoInput.files && photoInput.files[0]) { const reader = new FileReader(); reader.onload = async function(ev) { const driveUrl = await window.uploadToDrive(ev.target.result, photoInput.files[0].name); updateDB(driveUrl); }; reader.readAsDataURL(photoInput.files[0]); } else { updateDB(oldPhoto); }
-        }
+            e.preventDefault(); 
+            const id = document.getElementById('editTId').value; 
+            const name = document.getElementById('editTName').value.trim(); 
+            const subjects = document.getElementById('editTSubj').value.trim(); 
+            const phone = document.getElementById('editTPhone').value.trim(); 
+            const details = document.getElementById('editTDetails').value.trim(); 
+            const oldPhoto = document.getElementById('editTOldPhoto').value; 
+            const photoInput = document.getElementById('editTPhoto');
+            const teacher = db.teachers.find(t => String(t.id) === String(id)); 
+            if(!teacher) return;
 
-        window.addTeacher = function(e) { e.preventDefault(); const name = document.getElementById('tName').value.trim(); const subjects = document.getElementById('tSubj').value.trim(); const phone = document.getElementById('tPhone').value.trim(); const details = document.getElementById('tDetails').value.trim(); const photoInput = document.getElementById('tPhoto'); const saveToDB = (photoUrl) => { db.teachers.push({ id: 't_'+Date.now(), name, subjects, phone, details, photo: photoUrl }); window.saveDB(); window.showToast('Teacher Added Successfully!'); document.getElementById('addTeacherModal').classList.add('hidden'); document.getElementById('addTeacherModal').classList.remove('flex'); document.getElementById('tForm').reset(); window.renderApp(); }; if(photoInput.files && photoInput.files[0]) { const file = photoInput.files[0]; const reader = new FileReader(); reader.onload = async function(ev) { const driveUrl = await window.uploadToDrive(ev.target.result, file.name); saveToDB(driveUrl); }; reader.readAsDataURL(file); } else { saveToDB(null); } }
-        window.deleteTeacher = function(id) { if(confirm('Delete this teacher profile?')) { db.teachers = db.teachers.filter(t => t.id !== id); window.saveDB(); window.showToast('Teacher Deleted', 'error'); window.renderApp(); } }
+            const updateDB = (photoUrl) => { 
+                teacher.name = name; 
+                teacher.subjects = subjects; 
+                teacher.phone = phone; 
+                teacher.details = details; 
+                teacher.photo = photoUrl; 
+                window.saveDB(); 
+                window.showToast('Teacher Updated Successfully!'); 
+                document.getElementById('editTeacherModal').classList.add('hidden'); 
+                document.getElementById('editTeacherModal').classList.remove('flex'); 
+                const form = document.getElementById('editTForm');
+                if(form) form.reset(); 
+                window.renderApp(); 
+            };
+
+            if(photoInput.files && photoInput.files[0]) { 
+                const file = photoInput.files[0];
+                const reader = new FileReader(); 
+                reader.onload = async function(ev) { 
+                    let driveUrl = null;
+                    try {
+                        driveUrl = await window.uploadToDrive(ev.target.result, file.name); 
+                    } catch(err) {
+                        console.error('Drive upload failed, keeping old photo:', err);
+                    }
+                    updateDB(driveUrl || oldPhoto); 
+                }; 
+                reader.readAsDataURL(file); 
+            } else { 
+                updateDB(oldPhoto); 
+            }
+        };
+
+        window.addTeacher = function(e) { 
+            e.preventDefault(); 
+            const name = document.getElementById('tName').value.trim(); 
+            const subjects = document.getElementById('tSubj').value.trim(); 
+            const phone = document.getElementById('tPhone').value.trim(); 
+            const details = document.getElementById('tDetails').value.trim(); 
+            const photoInput = document.getElementById('tPhoto'); 
+
+            if(!name || !subjects || !phone) {
+                return alert('ദയവായി പേര്, വിഷയങ്ങൾ, ഫോൺ നമ്പർ എന്നിവ നൽകുക.');
+            }
+
+            const saveToDB = (photoUrl) => { 
+                if(!db.teachers) db.teachers = [];
+                db.teachers.push({ 
+                    id: 't_' + Date.now(), 
+                    name, 
+                    subjects, 
+                    phone, 
+                    details, 
+                    photo: photoUrl 
+                }); 
+                window.saveDB(); 
+                window.showToast('Teacher Added Successfully!'); 
+                document.getElementById('addTeacherModal').classList.add('hidden'); 
+                document.getElementById('addTeacherModal').classList.remove('flex'); 
+                const form = document.getElementById('tForm');
+                if(form) form.reset(); 
+                window.renderApp(); 
+            }; 
+
+            if(photoInput.files && photoInput.files[0]) { 
+                const file = photoInput.files[0]; 
+                const reader = new FileReader(); 
+                reader.onload = async function(ev) { 
+                    let driveUrl = null;
+                    try {
+                        driveUrl = await window.uploadToDrive(ev.target.result, file.name); 
+                    } catch(err) {
+                        console.error('Drive upload failed:', err);
+                    }
+                    saveToDB(driveUrl); 
+                }; 
+                reader.readAsDataURL(file); 
+            } else { 
+                saveToDB(null); 
+            } 
+        };
+
+        window.deleteTeacher = function(id) { 
+            if(confirm('Delete this teacher profile?')) { 
+                db.teachers = (db.teachers || []).filter(t => String(t.id) !== String(id)); 
+                window.saveDB(); 
+                window.showToast('Teacher Deleted', 'error'); 
+                window.renderApp(); 
+            } 
+        };
 
         window.currentFeeTab = 'monthly';
         window.selectedFeeMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
