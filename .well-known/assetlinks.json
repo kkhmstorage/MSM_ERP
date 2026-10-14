@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.kkhmstorage.twa",
+    "sha256_cert_fingerprints": [
+      "75:65:A1:55:19:C1:4F:71:15:B1:D8:DC:70:8B:B8:AC:A0:AC:CD:BC:8E:D3:D2:6B:78:11:B4:E3:DA:20:F6:01"
+    ]
+  }
+}]
