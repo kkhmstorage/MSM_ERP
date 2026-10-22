@@ -269,7 +269,7 @@
             logo: 'icons/logo.png', bg: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80', isVideoBg: false, bankName: 'HDFC BANK', accName: 'MUHYISSUNNA SECONDARY MADRASA', accNo: 'XXXXXXXXXXXXXX', ifsc: 'HDFC000XXXX', upi: 'msm@hdfcbank', qrCodeUrl: 'https://placehold.co/200x200/ffffff/000000?text=SCAN+TO+PAY'
         };
 
-        const INITIAL_DB = { settings: DEFAULT_SETTINGS, notices: [], exams: [], students: [], teachers: [], classTasks: [] };
+        const INITIAL_DB = { settings: DEFAULT_SETTINGS, notices: [], exams: [], students: [], teachers: [], classTasks: [], diary: [] };
 
         let db = null; window.currentUser = null; window.currentTab = ''; window.parentTab = 'fees';
 
@@ -287,6 +287,7 @@
                     if(!db.exams) db.exams = []; if(!db.settings) db.settings = DEFAULT_SETTINGS; if(!db.students) db.students = []; if(!db.teachers) db.teachers = [];
                     if(!db.settings.logo || db.settings.logo.includes('placehold.co')) { db.settings.logo = 'icons/logo.png'; }
                     if(!db.classTasks) db.classTasks = [];
+                    if(!db.diary) db.diary = [];
                 } else { db = INITIAL_DB; await setDoc(dbRef, db); }
                 
                 db.students.forEach(s => {
@@ -576,9 +577,9 @@
             const nav = document.getElementById('navMenu'); document.getElementById('headerUserName').innerText = window.currentUser.name; document.getElementById('headerUserRole').innerText = window.currentUser.role === 'admin1' ? 'PRINCIPAL' : window.currentUser.role.toUpperCase(); nav.innerHTML = '';
             let menu = [];
             
-            if (window.currentUser.role === 'admin') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Overview' }, { id: 'search', icon: 'fa-user-graduate', label: 'Student Profile' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'teachers', icon: 'fa-chalkboard-teacher', label: 'Teachers' }, { id: 'fee', icon: 'fa-wallet', label: 'Finance & Fees' }, { id: 'exams', icon: 'fa-file-alt', label: 'Examinations' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' }, { id: 'notices', icon: 'fa-bullhorn', label: 'Notice Board' }, { id: 'settings', icon: 'fa-cog', label: 'Settings' } ];
-            else if (window.currentUser.role === 'admin1') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Overview' }, { id: 'search', icon: 'fa-user-graduate', label: 'Student Profile' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'teachers', icon: 'fa-chalkboard-teacher', label: 'Teachers' }, { id: 'exams', icon: 'fa-file-alt', label: 'Examinations' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' }, { id: 'notices', icon: 'fa-bullhorn', label: 'Notice Board' } ];
-            else if (window.currentUser.role === 'mentor') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Attendance' }, { id: 'search', icon: 'fa-search', label: 'Manage Profile & Leave' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory (IN/OUT)' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'exams', icon: 'fa-file-alt', label: 'View Exams' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' } ];
+            if (window.currentUser.role === 'admin') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Overview' }, { id: 'diary', icon: 'fa-book-open', label: 'Daily Diary' }, { id: 'search', icon: 'fa-user-graduate', label: 'Student Profile' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'teachers', icon: 'fa-chalkboard-teacher', label: 'Teachers' }, { id: 'fee', icon: 'fa-wallet', label: 'Finance & Fees' }, { id: 'exams', icon: 'fa-file-alt', label: 'Examinations' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' }, { id: 'notices', icon: 'fa-bullhorn', label: 'Notice Board' }, { id: 'settings', icon: 'fa-cog', label: 'Settings' } ];
+            else if (window.currentUser.role === 'admin1') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Overview' }, { id: 'diary', icon: 'fa-book-open', label: 'Daily Diary' }, { id: 'search', icon: 'fa-user-graduate', label: 'Student Profile' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'teachers', icon: 'fa-chalkboard-teacher', label: 'Teachers' }, { id: 'exams', icon: 'fa-file-alt', label: 'Examinations' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' }, { id: 'notices', icon: 'fa-bullhorn', label: 'Notice Board' } ];
+            else if (window.currentUser.role === 'mentor') menu = [ { id: 'dash', icon: 'fa-chart-pie', label: 'Attendance' }, { id: 'diary', icon: 'fa-book-open', label: 'Daily Diary' }, { id: 'search', icon: 'fa-search', label: 'Manage Profile & Leave' }, { id: 'dir', icon: 'fa-address-book', label: 'Directory (IN/OUT)' }, { id: 'daily_tasks', icon: 'fa-tasks', label: 'Daily Tasks' }, { id: 'exams', icon: 'fa-file-alt', label: 'View Exams' }, { id: 'achieve', icon: 'fa-trophy', label: 'Achievements' } ];
             else if (window.currentUser.role === 'parent') { 
                 menu = [ { id: 'parent_portal', icon: 'fa-user-graduate', label: 'My Dashboard' } ]; 
                 window.currentTab = 'parent_portal'; 
@@ -628,6 +629,7 @@
         window.renderApp = function() {
             const content = document.getElementById('mainContent'); let html = '';
             if (window.currentTab === 'dash') html = window.renderDashboard(); 
+            else if (window.currentTab === 'diary') html = window.renderDiaryUI();
             else if (window.currentTab === 'search') html = window.renderStudentSearchUI(); 
             else if (window.currentTab === 'dir') html = window.renderDirectory(); 
             else if (window.currentTab === 'daily_tasks') html = window.renderDailyTasksReport();
@@ -2732,6 +2734,631 @@
             </div>
             `;
             window.openPrintWindow(html, `Notice_${n.title.replace(/\s+/g, '_')}`);
+        };
+
+        // ================= DAILY DIARY =================
+        window.diaryDateFilter = '';
+        window.diaryMonthFilter = '';
+        window.diaryCategoryFilter = 'all';
+        window.diaryClassFilter = 'all';
+        window.diarySearchQuery = '';
+        window.editingDiaryId = null;
+        window.showDiaryForm = false;
+
+        window.CATEGORIES_DIARY = [
+            { id: 'General', label: 'പൊതുവായത് (General)', icon: 'fa-info-circle', bg: 'bg-indigo-50 text-indigo-700 border-indigo-200', ribbon: 'bg-indigo-500' },
+            { id: 'Assembly', label: 'അസംബ്ലി (Assembly)', icon: 'fa-bullhorn', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', ribbon: 'bg-emerald-500' },
+            { id: 'Special Class', label: 'പ്രത്യേക ക്ലാസ് (Special Class)', icon: 'fa-book-reader', bg: 'bg-blue-50 text-blue-700 border-blue-200', ribbon: 'bg-blue-500' },
+            { id: 'Event', label: 'വിശേഷ പരിപാടി (Event / Program)', icon: 'fa-star', bg: 'bg-purple-50 text-purple-700 border-purple-200', ribbon: 'bg-purple-500' },
+            { id: 'Meeting', label: 'അധ്യാപക യോഗം (Staff Meeting)', icon: 'fa-users', bg: 'bg-amber-50 text-amber-800 border-amber-200', ribbon: 'bg-amber-500' },
+            { id: 'Exam', label: 'പരീക്ഷ / റിസൾട്ട് (Exam / Result)', icon: 'fa-file-signature', bg: 'bg-rose-50 text-rose-700 border-rose-200', ribbon: 'bg-rose-500' },
+            { id: 'Inspection', label: 'സന്ദർശനം / പരിശോധന (Visit)', icon: 'fa-clipboard-check', bg: 'bg-teal-50 text-teal-700 border-teal-200', ribbon: 'bg-teal-500' },
+            { id: 'Holiday', label: 'അവധി / പ്രഖ്യാപനം (Holiday)', icon: 'fa-calendar-times', bg: 'bg-orange-50 text-orange-700 border-orange-200', ribbon: 'bg-orange-500' }
+        ];
+
+        window.formatDiaryDateDisplay = function(dateStr) {
+            if(!dateStr) return '';
+            const malDays = ['ഞായർ', 'തിങ്കൾ', 'ചൊവ്വ', 'ബുധൻ', 'വ്യാഴം', 'വെള്ളി', 'ശനി'];
+            const d = new Date(dateStr + 'T00:00:00');
+            const dayName = isNaN(d.getDay()) ? '' : malDays[d.getDay()];
+            const formattedDate = isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            return `${formattedDate} (${dayName})`;
+        };
+
+        window.renderDiaryUI = function() {
+            if (!db.diary) db.diary = [];
+            const userRole = window.currentUser ? window.currentUser.role : 'parent';
+            const userName = window.currentUser ? window.currentUser.name : '';
+            const canPost = ['admin', 'admin1', 'mentor'].includes(userRole);
+            const isAdmin = userRole === 'admin' || userRole === 'admin1';
+
+            const classes = [...new Set((db.students || []).map(s => s.class))].filter(Boolean).sort();
+            const todayIso = new Date().toISOString().split('T')[0];
+            const currentMonthIso = todayIso.substring(0, 7);
+
+            // Filter calculation
+            let list = db.diary.slice();
+            list.sort((a,b) => {
+                if(b.date !== a.date) return (b.date || '').localeCompare(a.date || '');
+                return (b.id || '').localeCompare(a.id || '');
+            });
+
+            if (window.diaryDateFilter) {
+                list = list.filter(item => item.date === window.diaryDateFilter);
+            }
+            if (window.diaryMonthFilter) {
+                list = list.filter(item => (item.date || '').startsWith(window.diaryMonthFilter));
+            }
+            if (window.diaryCategoryFilter && window.diaryCategoryFilter !== 'all') {
+                list = list.filter(item => item.category === window.diaryCategoryFilter);
+            }
+            if (window.diaryClassFilter && window.diaryClassFilter !== 'all') {
+                list = list.filter(item => item.targetClass === window.diaryClassFilter || item.targetClass === 'All');
+            }
+            if (window.diarySearchQuery && window.diarySearchQuery.trim()) {
+                const q = window.diarySearchQuery.toLowerCase().trim();
+                list = list.filter(item => 
+                    (item.title && item.title.toLowerCase().includes(q)) ||
+                    (item.content && item.content.toLowerCase().includes(q)) ||
+                    (item.author && item.author.toLowerCase().includes(q))
+                );
+            }
+
+            const totalEntries = db.diary.length;
+            const thisMonthEntries = db.diary.filter(d => (d.date || '').startsWith(currentMonthIso)).length;
+            const todayEntries = db.diary.filter(d => d.date === todayIso).length;
+
+            // Editing item if any
+            const editingItem = window.editingDiaryId ? db.diary.find(d => String(d.id) === String(window.editingDiaryId)) : null;
+
+            return `
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- Header Card -->
+                <div class="bg-gradient-to-r from-[#022c22] via-[#064e3b] to-[#047857] text-white p-6 md:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
+                                <i class="fas fa-book-open text-2xl text-emerald-300"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-white flex items-center gap-2">
+                                    മദ്റസ ഡയറി <span class="text-sm font-semibold text-emerald-200 hidden sm:inline">(Daily Activity Diary)</span>
+                                </h2>
+                                <p class="text-xs text-emerald-100 font-medium mt-0.5">ഓരോ ദിവസത്തെയും മദ്റസയിലെ പ്രധാന പ്രവർത്തനങ്ങളും സംഭവങ്ങളും രേഖപ്പെടുത്തുക</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-start md:justify-end">
+                        ${canPost ? `
+                        <button onclick="window.toggleDiaryForm()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-900 font-black px-5 py-3 rounded-xl text-sm shadow-lg hover:shadow-emerald-400/30 transition flex items-center gap-2 active:scale-95">
+                            <i class="fas ${window.showDiaryForm ? 'fa-times' : 'fa-plus-circle'}"></i> 
+                            ${window.showDiaryForm ? 'ഫോം ഒഴിവാക്കുക' : '+ പുതിയ കുറിപ്പ് ചേർക്കുക'}
+                        </button>
+                        ` : ''}
+                        <button onclick="window.printFilteredDiary()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold px-4 py-3 rounded-xl text-sm backdrop-blur-md transition flex items-center gap-2">
+                            <i class="fas fa-print"></i> പ്രിന്റ് റിപ്പോർട്ട്
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold border border-emerald-100">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">ആകെ കുറിപ്പുകൾ</p>
+                            <p class="text-2xl font-black text-slate-800">${totalEntries}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold border border-blue-100">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">ഈ മാസത്തെ കുറിപ്പുകൾ</p>
+                            <p class="text-2xl font-black text-slate-800">${thisMonthEntries}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold border border-amber-100">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">ഇന്നത്തെ വിവരങ്ങൾ</p>
+                            <p class="text-2xl font-black text-slate-800">${todayEntries}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Bar -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-5 space-y-4">
+                    <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+                        <!-- Search Box -->
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" value="${window.diarySearchQuery || ''}" oninput="window.setDiarySearch(this.value)" placeholder="വിഷയം, വിവരങ്ങൾ, രേഖപ്പെടുത്തിയ ആൾ എന്നിവ തിരയുക..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-inner">
+                        </div>
+
+                        <!-- Date & Month Filters -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600">
+                                <i class="fas fa-calendar-day text-emerald-600"></i>
+                                <span>തീയതി:</span>
+                                <input type="date" value="${window.diaryDateFilter || ''}" onchange="window.setDiaryDateFilter(this.value)" class="bg-transparent border-0 outline-none text-xs font-bold text-slate-700 cursor-pointer">
+                            </div>
+
+                            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600">
+                                <i class="fas fa-calendar-week text-blue-600"></i>
+                                <span>മാസം:</span>
+                                <input type="month" value="${window.diaryMonthFilter || ''}" onchange="window.setDiaryMonthFilter(this.value)" class="bg-transparent border-0 outline-none text-xs font-bold text-slate-700 cursor-pointer">
+                            </div>
+
+                            <select onchange="window.setDiaryCategoryFilter(this.value)" class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                                <option value="all" ${window.diaryCategoryFilter === 'all' ? 'selected' : ''}>എല്ലാ വിഭാഗങ്ങളും (All)</option>
+                                ${window.CATEGORIES_DIARY.map(c => `<option value="${c.id}" ${window.diaryCategoryFilter === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
+                            </select>
+
+                            <select onchange="window.setDiaryClassFilter(this.value)" class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                                <option value="all" ${window.diaryClassFilter === 'all' ? 'selected' : ''}>എല്ലാ ക്ലാസുകളും</option>
+                                ${classes.map(c => `<option value="${c}" ${window.diaryClassFilter === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+
+                            ${(window.diaryDateFilter || window.diaryMonthFilter || (window.diaryCategoryFilter !== 'all') || (window.diaryClassFilter !== 'all') || window.diarySearchQuery) ? `
+                            <button onclick="window.resetDiaryFilters()" class="text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-xl border border-rose-200 transition flex items-center gap-1">
+                                <i class="fas fa-undo"></i> റീസെറ്റ്
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Entry Form Card -->
+                ${(window.showDiaryForm || editingItem) ? `
+                <div id="diaryFormCard" class="bg-white rounded-3xl border-2 border-emerald-500/40 shadow-xl p-6 md:p-8 relative overflow-hidden transition-all animate-fadeIn">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-500"></div>
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-black text-slate-800 flex items-center gap-2">
+                                <i class="fas ${editingItem ? 'fa-edit text-amber-500' : 'fa-pen-fancy text-emerald-600'}"></i>
+                                ${editingItem ? 'ഡയറി കുറിപ്പ് തിരുത്തുക (Edit Diary Entry)' : 'പുതിയ ഡയറി കുറിപ്പ് ചേർക്കുക (Add Daily Entry)'}
+                            </h3>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5">ഓരോ ദിവസത്തെയും മദ്റസ വിശേഷങ്ങൾ ഇവിടെ രേഖപ്പെടുത്തുക</p>
+                        </div>
+                        <button type="button" onclick="window.cancelDiaryForm()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+                    </div>
+
+                    <form onsubmit="window.saveDiaryEntry(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">തീയതി (Date) <span class="text-rose-500">*</span></label>
+                                <input type="date" required id="diaryDate" value="${editingItem ? editingItem.date : todayIso}" class="w-full border border-slate-300 p-2.5 rounded-xl text-sm font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">സമയം (Time)</label>
+                                <input type="time" id="diaryTime" value="${editingItem ? (editingItem.time || '') : new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}" class="w-full border border-slate-300 p-2.5 rounded-xl text-sm font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">വിഭാഗം (Category)</label>
+                                <select id="diaryCategory" class="w-full border border-slate-300 p-2.5 rounded-xl text-sm font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                                    ${window.CATEGORIES_DIARY.map(c => `
+                                        <option value="${c.id}" ${editingItem && editingItem.category === c.id ? 'selected' : ''}>${c.label}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">ബാധകമായ ക്ലാസ് (Class)</label>
+                                <select id="diaryTargetClass" class="w-full border border-slate-300 p-2.5 rounded-xl text-sm font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                                    <option value="All" ${(!editingItem || editingItem.targetClass === 'All') ? 'selected' : ''}>എല്ലാ ക്ലാസുകൾക്കും (All)</option>
+                                    ${classes.map(c => `<option value="${c}" ${editingItem && editingItem.targetClass === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">വിഷയം / ശീർഷകം (Title / Subject) <span class="text-rose-500">*</span></label>
+                            <input required id="diaryTitle" value="${editingItem ? (editingItem.title || '') : ''}" placeholder="ഉദാ: പ്രത്യേക ദുആ മജ്‌ലിസ് / അസംബ്ലിയിലെ പ്രധാന തീരുമാനങ്ങൾ / പ്രോഗ്രാം വിവരണം" class="w-full border border-slate-300 p-3 rounded-xl text-sm font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">നടന്ന കാര്യങ്ങളുടെ വിശദാംശങ്ങൾ (Detailed Happenings / Notes) <span class="text-rose-500">*</span></label>
+                            <textarea required id="diaryContent" rows="5" placeholder="ഇന്നത്തെ ദിവസത്തെ സംഭവങ്ങൾ, അസംബ്ലിയിൽ പറഞ്ഞ കാര്യങ്ങൾ, ക്ലാസ് പ്രവർത്തനങ്ങൾ, പ്രധാന അറിയിപ്പുകൾ, തീരുമാനങ്ങൾ എന്നിവ ഇവിടെ വിശദമായി രേഖപ്പെടുത്തുക..." class="w-full border border-slate-300 p-3.5 rounded-xl text-sm bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed">${editingItem ? (editingItem.content || '') : ''}</textarea>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+                            <label class="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-700 bg-amber-50 border border-amber-200 px-3.5 py-2 rounded-xl">
+                                <input type="checkbox" id="diaryImportant" ${editingItem && editingItem.isImportant ? 'checked' : ''} class="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500">
+                                <span>⭐ പ്രധാനപ്പെട്ട ദിവസം / സംഭവമായി ഹൈലൈറ്റ് ചെയ്യുക (Mark as Important)</span>
+                            </label>
+
+                            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                <button type="button" onclick="window.cancelDiaryForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-2.5 rounded-xl text-sm transition">
+                                    റദ്ദാക്കുക (Cancel)
+                                </button>
+                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-7 py-2.5 rounded-xl text-sm shadow-md transition flex items-center gap-2">
+                                    <i class="fas fa-save"></i> ${editingItem ? 'അപ്‌ഡേറ്റ് ചെയ്യുക (Update)' : 'സൂക്ഷിക്കുക (Save to Diary)'}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                ` : ''}
+
+                <!-- Timeline Feed -->
+                <div class="space-y-4">
+                    ${list.length > 0 ? list.map(item => {
+                        const catObj = window.CATEGORIES_DIARY.find(c => c.id === item.category) || { label: item.category || 'General', icon: 'fa-info-circle', bg: 'bg-indigo-50 text-indigo-700 border-indigo-200', ribbon: 'bg-indigo-500' };
+                        const canModify = isAdmin || (userRole === 'mentor' && (item.author === userName || item.authorRole === 'mentor'));
+
+                        return `
+                        <div class="bg-white rounded-3xl border ${item.isImportant ? 'border-amber-400 shadow-md ring-2 ring-amber-100' : 'border-slate-200 shadow-sm'} p-6 md:p-7 hover:shadow-md transition relative overflow-hidden group">
+                            <!-- Left Color Accent Ribbon -->
+                            <div class="absolute top-0 left-0 w-2.5 h-full ${item.isImportant ? 'bg-amber-500' : catObj.ribbon}"></div>
+
+                            <!-- Header Bar -->
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <!-- Date Badge -->
+                                    <span class="bg-slate-100 text-slate-800 px-3.5 py-1.5 rounded-xl text-xs font-black inline-flex items-center gap-1.5 border border-slate-200">
+                                        <i class="fas fa-calendar-alt text-emerald-600"></i> ${window.formatDiaryDateDisplay(item.date)}
+                                    </span>
+
+                                    ${item.time ? `
+                                    <span class="bg-slate-50 text-slate-600 px-2.5 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 border border-slate-200">
+                                        <i class="fas fa-clock text-slate-400"></i> ${item.time}
+                                    </span>
+                                    ` : ''}
+
+                                    <!-- Category Badge -->
+                                    <span class="${catObj.bg} px-3 py-1 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 border">
+                                        <i class="fas ${catObj.icon}"></i> ${catObj.label.split(' ')[0]}
+                                    </span>
+
+                                    <!-- Target Class Badge -->
+                                    <span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl text-xs font-bold border border-slate-200">
+                                        <i class="fas fa-graduation-cap text-slate-400 mr-1"></i>${item.targetClass === 'All' || !item.targetClass ? 'എല്ലാ ക്ലാസുകൾക്കും' : item.targetClass}
+                                    </span>
+
+                                    ${item.isImportant ? `
+                                    <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-xl text-xs font-black border border-amber-300 inline-flex items-center gap-1 animate-pulse">
+                                        <i class="fas fa-star text-amber-500"></i> പ്രധാനപ്പെട്ടത്
+                                    </span>
+                                    ` : ''}
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-2 self-end sm:self-center">
+                                    <button onclick="window.printSingleDiary('${item.id}')" title="Print this entry" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    ${canModify ? `
+                                    <button onclick="window.editDiaryEntry('${item.id}')" title="Edit entry" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button onclick="window.deleteDiaryEntry('${item.id}')" title="Delete entry" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <h4 class="text-lg md:text-xl font-black text-slate-900 mb-3 leading-snug">
+                                ${item.title}
+                            </h4>
+
+                            <!-- Description/Content -->
+                            <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50/80 p-4 rounded-2xl border border-slate-100 shadow-inner">
+                                ${item.content}
+                            </div>
+
+                            <!-- Footer Meta -->
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs text-slate-400">
+                                <div>
+                                    <i class="fas fa-user-edit text-slate-400 mr-1"></i> രേഖപ്പെടുത്തിയത്: <b class="text-slate-700 font-bold">${item.author || 'Staff'}</b> 
+                                    <span class="uppercase text-[10px] bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-500 ml-1">${item.authorRole || 'staff'}</span>
+                                </div>
+                                <div class="text-[11px] text-slate-400">
+                                    <i class="fas fa-calendar-check mr-1 text-slate-300"></i> ${item.createdAt ? new Date(item.createdAt).toLocaleString('en-GB') : ''}
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('') : `
+                    <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center text-slate-400 shadow-sm">
+                        <div class="w-20 h-20 mx-auto rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400 text-3xl mb-4 shadow-inner">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h4 class="text-base font-black text-slate-700 mb-1">ഡയറി കുറിപ്പുകൾ ലഭ്യമല്ല</h4>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto mb-6">തിരഞ്ഞെടുത്ത തീയതിയിലോ ഫിൽട്ടറുകളിലോ വിവരങ്ങളൊന്നും രേഖപ്പെടുത്തിയിട്ടില്ല.</p>
+                        ${canPost ? `
+                        <button onclick="window.toggleDiaryForm(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-md transition inline-flex items-center gap-2">
+                            <i class="fas fa-plus"></i> ആദ്യത്തെ കുറിപ്പ് ചേർക്കുക
+                        </button>
+                        ` : ''}
+                    </div>
+                    `}
+                </div>
+            </div>
+            `;
+        };
+
+        window.toggleDiaryForm = function(force) {
+            if(force !== undefined) window.showDiaryForm = force;
+            else window.showDiaryForm = !window.showDiaryForm;
+            if(!window.showDiaryForm) window.editingDiaryId = null;
+            window.renderApp();
+            if(window.showDiaryForm) {
+                setTimeout(() => {
+                    const el = document.getElementById('diaryFormCard');
+                    if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            }
+        };
+
+        window.cancelDiaryForm = function() {
+            window.editingDiaryId = null;
+            window.showDiaryForm = false;
+            window.renderApp();
+        };
+
+        window.saveDiaryEntry = function(e) {
+            if(e) e.preventDefault();
+            const dateInput = document.getElementById('diaryDate');
+            const timeInput = document.getElementById('diaryTime');
+            const catInput = document.getElementById('diaryCategory');
+            const classInput = document.getElementById('diaryTargetClass');
+            const titleInput = document.getElementById('diaryTitle');
+            const contentInput = document.getElementById('diaryContent');
+            const impInput = document.getElementById('diaryImportant');
+
+            if(!dateInput || !titleInput || !contentInput) return;
+            const date = dateInput.value;
+            const time = timeInput ? timeInput.value : '';
+            const category = catInput ? catInput.value : 'General';
+            const targetClass = classInput ? classInput.value : 'All';
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            const isImportant = impInput ? impInput.checked : false;
+
+            if(!date) return window.showToast('ദയവായി തീയതി തിരഞ്ഞെടുക്കുക!', 'error');
+            if(!title || !content) return window.showToast('ദയവായി ശീർഷകവും വിവരങ്ങളും നൽകുക!', 'error');
+
+            if(!db.diary) db.diary = [];
+
+            if(window.editingDiaryId) {
+                const item = db.diary.find(d => String(d.id) === String(window.editingDiaryId));
+                if(item) {
+                    item.date = date;
+                    item.time = time;
+                    item.category = category;
+                    item.targetClass = targetClass;
+                    item.title = title;
+                    item.content = content;
+                    item.isImportant = isImportant;
+                    item.updatedAt = new Date().toISOString();
+                    item.updatedBy = window.currentUser ? window.currentUser.name : 'Staff';
+                    window.showToast('ഡയറി കുറിപ്പ് അപ്‌ഡേറ്റ് ചെയ്തു!');
+                }
+                window.editingDiaryId = null;
+                window.showDiaryForm = false;
+            } else {
+                const newEntry = {
+                    id: 'diary_' + Date.now(),
+                    date: date,
+                    time: time,
+                    category: category,
+                    targetClass: targetClass,
+                    title: title,
+                    content: content,
+                    isImportant: isImportant,
+                    author: window.currentUser ? window.currentUser.name : 'Staff',
+                    authorRole: window.currentUser ? window.currentUser.role : 'admin',
+                    createdAt: new Date().toISOString()
+                };
+                db.diary.push(newEntry);
+                window.showToast('ഡയറി കുറിപ്പ് വിജയകരമായി ചേർത്തു!');
+                window.showDiaryForm = false;
+            }
+
+            window.saveDB();
+            window.renderApp();
+        };
+
+        window.editDiaryEntry = function(id) {
+            window.editingDiaryId = id;
+            window.showDiaryForm = true;
+            window.renderApp();
+            setTimeout(() => {
+                const el = document.getElementById('diaryFormCard');
+                if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 60);
+        };
+
+        window.deleteDiaryEntry = function(id) {
+            if(confirm('ഈ ഡയറി കുറിപ്പ് ഡിലീറ്റ് ചെയ്യണോ? (Are you sure you want to delete this diary entry?)')) {
+                db.diary = (db.diary || []).filter(d => String(d.id) !== String(id));
+                if(window.editingDiaryId === id) {
+                    window.editingDiaryId = null;
+                    window.showDiaryForm = false;
+                }
+                window.saveDB();
+                window.showToast('ഡയറി കുറിപ്പ് നീക്കം ചെയ്തു', 'error');
+                window.renderApp();
+            }
+        };
+
+        window.setDiaryDateFilter = function(val) {
+            window.diaryDateFilter = val;
+            window.diaryMonthFilter = '';
+            window.renderApp();
+        };
+
+        window.setDiaryMonthFilter = function(val) {
+            window.diaryMonthFilter = val;
+            window.diaryDateFilter = '';
+            window.renderApp();
+        };
+
+        window.setDiaryCategoryFilter = function(val) {
+            window.diaryCategoryFilter = val;
+            window.renderApp();
+        };
+
+        window.setDiaryClassFilter = function(val) {
+            window.diaryClassFilter = val;
+            window.renderApp();
+        };
+
+        window.setDiarySearch = function(val) {
+            window.diarySearchQuery = val;
+            window.renderApp();
+        };
+
+        window.resetDiaryFilters = function() {
+            window.diaryDateFilter = '';
+            window.diaryMonthFilter = '';
+            window.diaryCategoryFilter = 'all';
+            window.diaryClassFilter = 'all';
+            window.diarySearchQuery = '';
+            window.renderApp();
+        };
+
+        window.printSingleDiary = function(id) {
+            const item = (db.diary || []).find(d => String(d.id) === String(id));
+            if(!item) return;
+            const catObj = window.CATEGORIES_DIARY.find(c => c.id === item.category) || { label: item.category || 'General' };
+            const html = `
+            <div style="max-width: 800px; margin: auto; padding: 35px; border: 3px double #022c22; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                <div class="header" style="margin-bottom: 20px; border-bottom: 2px solid #022c22; padding-bottom: 12px; text-align: center;">
+                    <h2 class="title" style="margin: 0; font-size: 24px; color: #022c22; font-weight: 900;">MUHYISSUNNA SECONDARY MADRASA</h2>
+                    <p class="subtitle" style="margin: 4px 0 0 0; font-size: 13px; color: #555;">Moochikkal, Valanchery | Affiliation No: 171 (Samastha Kerala Islamatha Vidhyabyasa Board)</p>
+                    <div style="margin-top: 10px; display: inline-block; background: #022c22; color: white; padding: 4px 16px; font-size: 12px; font-weight: bold; border-radius: 20px;">
+                        DAILY DIARY LOG RECORD / ദൈനംദിന ഡയറി കുറിപ്പ്
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+                    <span>തീയതി: <b>${window.formatDiaryDateDisplay(item.date)}</b></span>
+                    <span>സമയം: <b>${item.time || '-'}</b></span>
+                    <span>വിഭാഗം: <b>${catObj.label.split(' ')[0]}</b></span>
+                    <span>ക്ലാസ്: <b>${item.targetClass === 'All' || !item.targetClass ? 'എല്ലാ ക്ലാസുകൾക്കും' : item.targetClass}</b></span>
+                </div>
+                <div style="margin: 20px 0;">
+                    <h1 style="font-size: 20px; font-weight: 900; color: #022c22; margin-bottom: 12px;">
+                        ${item.title}
+                        ${item.isImportant ? '<span style="color: #d97706; font-size: 13px; font-weight: bold; margin-left: 8px;">★ പ്രധാനപ്പെട്ടത്</span>' : ''}
+                    </h1>
+                    <div style="font-size: 14px; line-height: 1.9; color: #222; white-space: pre-line; background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; min-height: 160px;">
+                        ${item.content}
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 15px;">
+                    രേഖപ്പെടുത്തിയത്: <b>${item.author || 'Staff'}</b> (${item.authorRole || 'staff'}) | രേഖപ്പെടുത്തിയ സമയം: ${item.createdAt ? new Date(item.createdAt).toLocaleString('en-GB') : '-'}
+                </div>
+                <div style="margin-top: 60px; display: flex; justify-content: space-between; font-size: 13px; font-weight: bold;">
+                    <div>
+                        <p style="border-top: 1px solid #888; padding-top: 5px; width: 150px; text-align: center;">Class Muallim / Staff</p>
+                    </div>
+                    <div>
+                        <p style="border-top: 1px solid #888; padding-top: 5px; width: 150px; text-align: center;">Sadr Muallim / Principal</p>
+                    </div>
+                </div>
+            </div>
+            `;
+            window.openPrintWindow(html, `Diary_${item.date}_${(item.title || '').replace(/\s+/g, '_')}`);
+        };
+
+        window.printFilteredDiary = function() {
+            let list = (db.diary || []).slice();
+            list.sort((a,b) => {
+                if(b.date !== a.date) return (b.date || '').localeCompare(a.date || '');
+                return (b.id || '').localeCompare(a.id || '');
+            });
+            if (window.diaryDateFilter) list = list.filter(item => item.date === window.diaryDateFilter);
+            if (window.diaryMonthFilter) list = list.filter(item => (item.date || '').startsWith(window.diaryMonthFilter));
+            if (window.diaryCategoryFilter && window.diaryCategoryFilter !== 'all') list = list.filter(item => item.category === window.diaryCategoryFilter);
+            if (window.diaryClassFilter && window.diaryClassFilter !== 'all') list = list.filter(item => item.targetClass === window.diaryClassFilter || item.targetClass === 'All');
+            if (window.diarySearchQuery && window.diarySearchQuery.trim()) {
+                const q = window.diarySearchQuery.toLowerCase().trim();
+                list = list.filter(item => 
+                    (item.title && item.title.toLowerCase().includes(q)) ||
+                    (item.content && item.content.toLowerCase().includes(q)) ||
+                    (item.author && item.author.toLowerCase().includes(q))
+                );
+            }
+            if(list.length === 0) {
+                return window.showToast('പ്രിന്റ് ചെയ്യാൻ ഡയറി കുറിപ്പുകളൊന്നുമില്ല!', 'error');
+            }
+            
+            let rowsHtml = list.map((item, idx) => {
+                const catObj = window.CATEGORIES_DIARY.find(c => c.id === item.category) || { label: item.category || 'General' };
+                return `
+                <tr style="border-bottom: 1px solid #e2e8f0; font-size: 13px;">
+                    <td style="padding: 10px; font-weight: bold; width: 40px; text-align: center;">${idx + 1}</td>
+                    <td style="padding: 10px; white-space: nowrap; font-weight: bold; width: 150px;">
+                        ${window.formatDiaryDateDisplay(item.date)}<br>
+                        <span style="font-size: 11px; color: #64748b; font-weight: normal;">${item.time || ''}</span>
+                    </td>
+                    <td style="padding: 10px; width: 130px;">
+                        <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: #e0f2fe; color: #0369a1; font-weight: bold;">
+                            ${catObj.label.split(' ')[0]}
+                        </span><br>
+                        <span style="font-size: 11px; color: #64748b;">${item.targetClass === 'All' || !item.targetClass ? 'എല്ലാ ക്ലാസുകൾക്കും' : item.targetClass}</span>
+                    </td>
+                    <td style="padding: 10px;">
+                        <b style="color: #022c22; font-size: 14px;">${item.title}</b>
+                        ${item.isImportant ? '<span style="color: #d97706; font-size: 11px; font-weight: bold; margin-left: 6px;">★ പ്രധാനപ്പെട്ടത്</span>' : ''}
+                        <div style="margin-top: 6px; color: #334155; line-height: 1.6; white-space: pre-line; font-size: 12px;">
+                            ${item.content}
+                        </div>
+                        <div style="margin-top: 4px; font-size: 11px; color: #94a3b8;">
+                            രേഖപ്പെടുത്തിയത്: ${item.author || 'Staff'} (${item.authorRole || 'staff'})
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            const filterDesc = window.diaryDateFilter ? `തീയതി: ${window.formatDiaryDateDisplay(window.diaryDateFilter)}` : (window.diaryMonthFilter ? `മാസം: ${window.diaryMonthFilter}` : 'സമ്പൂർണ്ണ ഡയറി റിപ്പോർട്ട്');
+
+            const html = `
+            <div style="max-width: 900px; margin: auto; padding: 25px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                <div class="header" style="margin-bottom: 20px; border-bottom: 2px solid #022c22; padding-bottom: 12px; text-align: center;">
+                    <h2 class="title" style="margin: 0; font-size: 24px; color: #022c22; font-weight: 900;">MUHYISSUNNA SECONDARY MADRASA</h2>
+                    <p class="subtitle" style="margin: 4px 0 0 0; font-size: 13px; color: #555;">Moochikkal, Valanchery | Affiliation No: 171 (Samastha Kerala Islamatha Vidhyabyasa Board)</p>
+                    <div style="margin-top: 10px; display: inline-block; background: #022c22; color: white; padding: 4px 16px; font-size: 12px; font-weight: bold; border-radius: 20px;">
+                        DAILY DIARY LOG BOOK REPORT / ദൈനംദിന ഡയറി രേഖ
+                    </div>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; font-weight: bold; color: #475569;">${filterDesc} | ആകെ എൻട്രികൾ: ${list.length}</p>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; font-size: 12px; color: #475569;">
+                            <th style="padding: 10px; text-align: center;">#</th>
+                            <th style="padding: 10px;">തീയതി / സമയം</th>
+                            <th style="padding: 10px;">വിഭാഗം / ക്ലാസ്</th>
+                            <th style="padding: 10px;">വിവരം / കുറിപ്പ്</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+                <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 13px; font-weight: bold;">
+                    <div>
+                        <p style="border-top: 1px solid #888; padding-top: 5px; width: 160px; text-align: center;">Compiled Staff</p>
+                    </div>
+                    <div>
+                        <p style="border-top: 1px solid #888; padding-top: 5px; width: 160px; text-align: center;">Sadr Muallim / Principal</p>
+                    </div>
+                </div>
+            </div>
+            `;
+            window.openPrintWindow(html, `Diary_Report_${Date.now()}`);
         };
 
         // ================= ACHIEVEMENTS =================

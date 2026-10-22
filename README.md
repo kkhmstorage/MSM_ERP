@@ -5,6 +5,7 @@
 ## ✨ Features
 
 - 📊 **Dashboard** — Real-time statistics and overview
+- 📖 **Daily Diary** — Madrasa daily activity and event logging with print reports
 - 👨‍🎓 **Student Management** — Enrollment, profiles, and records
 - 🏫 **Class Management** — Sections, subjects, and timetables  
 - 📝 **Attendance Tracking** — Daily attendance with reports
